@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ByteRidge · Security Awareness Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0B2545;--blue:#1A4A8A;--accent:#2176FF;--accent-light:#E6F1FF;
+  --green:#1A7A4A;--green-bg:#E6F5ED;--red:#C0392B;--red-bg:#FDECEA;
+  --amber:#B7640A;--amber-bg:#FEF3E2;--purple:#534AB7;--purple-bg:#EEEDFE;
+  --text:#1A2B3C;--muted:#5A7A9A;--border:#D0DFF0;--surface:#F4F8FF;--white:#FFFFFF;
+  --shadow:0 2px 12px rgba(11,37,69,0.08);--radius:10px;--radius-sm:7px
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;color:var(--text);background:#EEF3FA;min-height:100vh;font-size:15px;line-height:1.6}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--navy);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 16px rgba(0,0,0,0.2)}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.logo{width:36px;height:36px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:#fff;flex-shrink:0}
+.topbar-title{color:#fff;font-size:15px;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.month-pill{background:var(--accent);color:#fff;padding:4px 12px;border-radius:16px;font-size:11px;font-weight:600;letter-spacing:0.3px}
+
+/* ── MODULE SWITCHER ── */
+.module-bar{background:var(--navy);border-top:1px solid rgba(255,255,255,0.1);display:flex;justify-content:center;gap:4px;padding:8px 24px;position:sticky;top:56px;z-index:199}
+.module-btn{padding:7px 22px;border:1px solid rgba(255,255,255,0.2);border-radius:20px;background:transparent;color:rgba(255,255,255,0.65);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.18s;display:flex;align-items:center;gap:6px}
+.module-btn:hover{background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.4)}
+.module-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.module-btn .mbadge{background:rgba(255,255,255,0.15);border-radius:8px;padding:1px 7px;font-size:10px;font-family:'DM Mono',monospace}
+.module-btn.active .mbadge{background:rgba(255,255,255,0.25)}
+
+/* ── MODULE PANELS ── */
+.module{display:none}
+.module.active{display:block}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,#1A3A6A 100%);padding:36px 24px 28px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:rgba(33,118,255,0.08);pointer-events:none}
+.hero::after{content:'';position:absolute;bottom:-40px;left:-40px;width:200px;height:200px;border-radius:50%;background:rgba(33,118,255,0.06);pointer-events:none}
+.hero-badge{display:inline-block;background:rgba(33,118,255,0.2);border:1px solid rgba(33,118,255,0.4);color:#7BA7D4;padding:4px 14px;border-radius:16px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.hero-title{font-size:clamp(20px,4vw,32px);font-weight:600;color:#fff;margin-bottom:8px;line-height:1.25}
+.hero-title span{color:var(--accent)}
+.hero-desc{font-size:13px;color:#7BA7D4;max-width:540px;margin:0 auto 20px;line-height:1.7}
+.hero-stats{display:flex;justify-content:center;gap:24px;flex-wrap:wrap}
+.hstat{text-align:center}
+.hstat-val{font-size:22px;font-weight:600;color:#fff}
+.hstat-lbl{font-size:11px;color:#7BA7D4;margin-top:1px}
+
+/* ── MAIN LAYOUT ── */
+.main{max-width:900px;margin:0 auto;padding:20px 16px 60px}
+
+/* ── NAV TABS ── */
+.tabs{display:flex;gap:4px;background:var(--white);border-radius:var(--radius);padding:5px;box-shadow:var(--shadow);margin-bottom:20px;overflow-x:auto}
+.tab{flex:1;padding:9px 12px;border:none;border-radius:var(--radius-sm);background:transparent;color:var(--muted);font-size:12.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:all 0.2s;min-width:70px}
+.tab:hover{background:var(--surface);color:var(--navy)}
+.tab.active{background:var(--navy);color:#fff}
+.tab .tab-icon{display:block;font-size:16px;margin-bottom:2px}
+
+/* ── SECTIONS ── */
+.section{display:none;animation:fadeIn 0.25s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CARDS ── */
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:14px}
+.card-title{font-size:14px;font-weight:600;color:var(--navy);margin-bottom:12px}
+.section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--accent);margin-bottom:6px}
+
+/* ── BANNERS ── */
+.advisory{background:var(--amber-bg);border:1px solid #F5D28A;border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start}
+.adv-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.adv-title{font-size:13px;font-weight:600;color:var(--amber);margin-bottom:3px}
+.adv-text{font-size:12px;color:#7A5C10;line-height:1.55}
+.info-banner{background:var(--accent-light);border:1px solid #B5D4F4;border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start}
+.info-banner .adv-title{color:var(--blue)}
+.info-banner .adv-text{color:var(--blue)}
+.success-banner{background:var(--green-bg);border:1px solid #A9D9BE;border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start}
+.success-banner .adv-title{color:var(--green)}
+.success-banner .adv-text{color:#2A5E3A}
+
+/* ── ROADMAP ── */
+.quarter{border-radius:var(--radius);overflow:hidden;margin-bottom:10px;box-shadow:var(--shadow)}
+.q-header{padding:12px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.q-header .chevron{font-size:12px;transition:transform 0.2s}
+.q-header.open .chevron{transform:rotate(90deg)}
+.q1h{background:#DDEAF8;color:#185FA5}
+.q2h{background:#DCF0E3;color:#1A7A4A}
+.q3h{background:#FDE8D3;color:#C0550A}
+.q4h{background:#F5DCE4;color:#993556}
+.months-grid{display:grid;grid-template-columns:repeat(3,1fr);background:var(--white)}
+.month-card{padding:14px;border-top:1px solid var(--border);cursor:pointer;transition:background 0.15s;position:relative}
+.month-card:not(:nth-child(3n)){border-right:1px solid var(--border)}
+.month-card:hover{background:var(--surface)}
+.month-card.current{background:var(--accent-light)}
+.month-card.current::after{content:'ACTIVE';position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;font-size:8px;font-weight:700;padding:2px 6px;border-radius:8px;letter-spacing:0.5px}
+.mc-num{font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px}
+.mc-title{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:2px}
+.mc-theme{font-size:11px;color:var(--muted)}
+.month-detail{background:var(--white);border-top:1px solid var(--border);padding:16px;display:none}
+.month-detail.open{display:block}
+.md-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.md-dot{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0}
+.md-name{font-size:15px;font-weight:600;color:var(--navy)}
+.md-quarter{font-size:12px;color:var(--muted);margin-top:2px}
+.deliverables{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.dtag{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:500}
+.dtag.blue{background:var(--accent-light);color:var(--blue)}
+.dtag.green{background:var(--green-bg);color:var(--green)}
+.dtag.red{background:var(--red-bg);color:var(--red)}
+.dtag.amber{background:var(--amber-bg);color:var(--amber)}
+.initiatives{list-style:none;margin-bottom:14px}
+.initiatives li{font-size:12px;color:var(--muted);padding:4px 0 4px 16px;position:relative;line-height:1.5}
+.initiatives li::before{content:'›';position:absolute;left:0;color:var(--accent);font-weight:600}
+.md-actions{display:flex;gap:8px;flex-wrap:wrap}
+.action-btn{padding:8px 16px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all 0.15s}
+.action-btn.primary{background:var(--navy);color:#fff}
+.action-btn.secondary{background:var(--surface);color:var(--navy);border:1px solid var(--border)}
+.action-btn:hover{opacity:0.85;transform:translateY(-1px)}
+
+/* ── QUIZ ── */
+.month-selector{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
+.ms-btn{padding:5px 12px;border:1px solid var(--border);border-radius:20px;background:var(--white);color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.ms-btn:hover{border-color:var(--accent);color:var(--accent)}
+.ms-btn.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.quiz-meta{background:var(--surface);border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.q-info{font-size:12px;color:var(--muted)}
+.q-score{font-size:13px;font-weight:600;color:var(--navy)}
+.progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;margin-top:8px}
+.progress-fill{height:4px;background:var(--accent);border-radius:2px;transition:width 0.4s ease}
+.question-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-bottom:12px}
+.q-number{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--accent);margin-bottom:8px}
+.q-text{font-size:15px;font-weight:500;color:var(--navy);line-height:1.55;margin-bottom:16px}
+.options{display:flex;flex-direction:column;gap:8px}
+.option{padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);text-align:left;width:100%;transition:all 0.15s;line-height:1.4}
+.option:hover:not(:disabled){background:var(--accent-light);border-color:var(--accent)}
+.option.correct{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+.option.wrong{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.option:disabled{cursor:default}
+.feedback{margin-top:12px;padding:12px 14px;border-radius:var(--radius-sm);font-size:13px;line-height:1.6;display:none}
+.feedback.show{display:block}
+.feedback.correct{background:var(--green-bg);color:var(--green)}
+.feedback.wrong{background:var(--red-bg);color:var(--red)}
+.next-btn{margin-top:12px;padding:9px 20px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;display:none;transition:all 0.15s}
+.next-btn.show{display:inline-block}
+.next-btn:hover{background:var(--blue)}
+.result-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:32px 24px;text-align:center}
+.result-score{font-size:52px;font-weight:600;color:var(--navy);line-height:1}
+.result-pct{font-size:15px;color:var(--muted);margin-top:4px}
+.result-msg{font-size:14px;line-height:1.7;margin:16px auto;max-width:420px}
+.result-badges{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:14px}
+.badge{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600}
+.badge.green{background:var(--green-bg);color:var(--green)}
+.badge.amber{background:var(--amber-bg);color:var(--amber)}
+.badge.red{background:var(--red-bg);color:var(--red)}
+.restart-btn{margin-top:20px;padding:11px 28px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* ── PHISHING SIM ── */
+.sim-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.sim-counter{font-size:13px;color:var(--muted)}
+.sim-score{display:flex;gap:20px}
+.sim-stat span{font-size:22px;font-weight:600}
+.sim-stat .label{font-size:11px;color:var(--muted)}
+.email-frame{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px}
+.email-chrome{background:#E8EDF5;padding:10px 14px;display:flex;align-items:center;gap:8px}
+.chrome-dots{display:flex;gap:5px}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot-red{background:#FF5F57}.dot-amber{background:#FFBD2E}.dot-green{background:#28C840}
+.chrome-label{font-size:11px;color:var(--muted);margin-left:4px}
+.email-header{padding:14px 16px;border-bottom:1px solid var(--border)}
+.email-field{font-size:12px;color:var(--muted);margin-bottom:5px;display:flex;gap:6px;align-items:baseline}
+.email-field strong{color:var(--text);font-weight:500;flex-shrink:0}
+.email-field .val{color:var(--text)}
+.email-field .red{color:var(--red);font-weight:500}
+.email-subject{font-size:16px;font-weight:600;color:var(--navy);margin-top:8px}
+.email-body{padding:16px;font-size:13px;line-height:1.8;color:var(--text);white-space:pre-line}
+.email-link{color:var(--accent);text-decoration:underline;cursor:default}
+.email-actions{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap}
+.phish-btn{padding:9px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;border:none;transition:all 0.15s}
+.phish-btn.danger{background:var(--red);color:#fff}
+.phish-btn.safe{background:var(--green);color:#fff}
+.phish-btn:disabled{opacity:0.5;cursor:default}
+.verdict{display:none;padding:14px 16px;font-size:13px;line-height:1.6;border-top:1px solid var(--border)}
+.verdict.show{display:block}
+.verdict.phishing{background:var(--red-bg);color:var(--red)}
+.verdict.legit{background:var(--green-bg);color:var(--green)}
+.verdict-title{font-weight:600;font-size:14px;margin-bottom:8px}
+.clue-list{padding-left:16px}
+.clue-list li{margin-bottom:4px}
+
+/* ── TIPS ── */
+.tip-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start}
+.tip-icon{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.tip-icon.blue{background:var(--accent-light)}
+.tip-icon.green{background:var(--green-bg)}
+.tip-icon.red{background:var(--red-bg)}
+.tip-icon.amber{background:var(--amber-bg)}
+.tip-title{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:3px}
+.tip-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ── SOC2 MODULE STYLES ── */
+.soc2-nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px}
+.soc2-nav-btn{padding:7px 15px;border:1px solid var(--border);border-radius:20px;background:var(--white);color:var(--muted);font-size:12.5px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;display:flex;align-items:center;gap:6px}
+.soc2-nav-btn:hover{border-color:var(--accent);color:var(--accent)}
+.soc2-nav-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.soc2-nav-btn.done{border-color:var(--green);color:var(--green)}
+.soc2-nav-btn.done.active{background:var(--green);color:#fff}
+.soc2-check{font-size:11px}
+
+.soc2-section{display:none;animation:fadeIn 0.25s ease}
+.soc2-section.active{display:block}
+
+.sec-hero{background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 100%);border-radius:var(--radius);padding:20px 22px;margin-bottom:14px;color:#fff;position:relative;overflow:hidden}
+.sec-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:150px;height:150px;border-radius:50%;background:rgba(33,118,255,0.12);pointer-events:none}
+.sec-eyebrow{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:0.12em;color:#7BA7D4;text-transform:uppercase;margin-bottom:6px}
+.sec-title{font-size:18px;font-weight:600;margin-bottom:6px;line-height:1.25}
+.sec-desc{font-size:13px;color:#A8C4E0;line-height:1.6}
+.sec-badge{display:inline-block;margin-top:10px;background:rgba(33,118,255,0.25);border:1px solid rgba(33,118,255,0.4);border-radius:12px;padding:3px 12px;font-size:10px;font-weight:600;letter-spacing:0.06em;color:#7BA7D4;text-transform:uppercase}
+.sec-badge.critical{background:rgba(192,57,43,0.25);border-color:rgba(192,57,43,0.5);color:#F9A8A8}
+.sec-badge.audit{background:rgba(83,74,183,0.25);border-color:rgba(83,74,183,0.5);color:#C4BEFA}
+.sec-badge.cert{background:rgba(26,122,74,0.25);border-color:rgba(26,122,74,0.5);color:#86EFB4}
+
+.topics-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;margin-bottom:14px}
+.topics-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px}
+.topic-item{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;margin-bottom:8px}
+.topic-item:last-child{margin-bottom:0}
+.topic-arrow{color:var(--accent);font-weight:600;flex-shrink:0}
+
+.activity-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;border-left:3px solid var(--border)}
+.activity-card.type-scorm{border-left-color:var(--amber)}
+.activity-card.type-quiz{border-left-color:var(--green)}
+.activity-card.type-page{border-left-color:var(--accent)}
+.activity-card.type-file{border-left-color:var(--red)}
+.activity-card.type-cert{border-left-color:var(--purple)}
+.act-icon-box{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:var(--surface)}
+.act-body .act-name{font-size:13.5px;font-weight:600;color:var(--navy);margin-bottom:3px}
+.act-body .act-desc{font-size:12px;color:var(--muted);line-height:1.55}
+.act-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.act-tag{font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace}
+
+/* SOC2 Quiz (hub quiz) */
+.hub-quiz-wrap{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px}
+.hub-quiz-head{background:var(--surface);padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.hub-quiz-title{font-size:14px;font-weight:600;color:var(--navy)}
+.hub-quiz-badge{background:var(--green-bg);color:var(--green);border:1px solid #A9D9BE;border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600}
+.hub-quiz-body{padding:18px}
+.hub-progress-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.hub-progress-label{font-size:12px;color:var(--muted)}
+.hub-score-label{font-size:12px;font-weight:600;color:var(--navy)}
+
+/* Acknowledgment form */
+.ack-form{max-width:540px}
+.ack-field{margin-bottom:12px}
+.ack-label{font-size:13px;color:var(--navy);font-weight:500;margin-bottom:5px;display:block}
+.ack-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13.5px;outline:none;transition:border-color 0.15s}
+.ack-input:focus{border-color:var(--accent)}
+.ack-checks{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.ack-check-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s}
+.ack-check-item:last-child{border-bottom:none}
+.ack-check-item:hover{background:var(--surface)}
+.ack-check-item input{width:15px;height:15px;margin-top:2px;flex-shrink:0;accent-color:var(--accent);cursor:pointer}
+.ack-check-text{font-size:13px;color:var(--text);line-height:1.55}
+.ack-submit-btn{padding:10px 24px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.ack-submit-btn:hover{background:#1A65E8}
+.ack-success{display:none;background:var(--green-bg);border:1px solid #A9D9BE;border-radius:var(--radius);padding:14px 18px;margin-top:14px;font-size:13px;color:var(--green);line-height:1.6}
+
+/* Nav between sections */
+.sec-nav-row{display:flex;justify-content:space-between;margin-top:8px}
+.sec-nav-btn{padding:9px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;border:1px solid var(--border);background:var(--white);color:var(--navy);transition:all 0.15s}
+.sec-nav-btn:hover{background:var(--surface);border-color:var(--accent);color:var(--accent)}
+.sec-nav-btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.sec-nav-btn.primary:hover{background:var(--blue);border-color:var(--blue)}
+
+/* Cert */
+.cert-wrap{display:flex;flex-direction:column;align-items:center;padding:8px 0}
+.cert-card{width:100%;max-width:600px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:36px 40px;text-align:center;box-shadow:0 4px 24px rgba(11,37,69,0.12);position:relative;overflow:hidden}
+.cert-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% -20%,rgba(33,118,255,0.06) 0%,transparent 60%);pointer-events:none}
+.cert-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.14em;color:var(--accent);text-transform:uppercase;margin-bottom:18px}
+.cert-h{font-size:26px;font-weight:600;color:var(--navy);margin-bottom:6px}
+.cert-sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+.cert-name{font-size:20px;font-weight:600;color:var(--accent);margin-bottom:20px;padding:10px 22px;background:var(--accent-light);border-radius:var(--radius-sm);display:inline-block}
+.cert-course{font-size:14px;font-weight:500;color:var(--navy);margin-bottom:4px}
+.cert-date{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:22px}
+.cert-divider{height:1px;background:var(--border);margin-bottom:16px}
+.cert-id{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+.cert-btns{margin-top:18px;display:flex;gap:10px;justify-content:center}
+
+/* Admin config */
+.config-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px;margin-bottom:20px}
+.config-cell{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
+.config-key{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px}
+.config-val{font-size:13.5px;font-weight:500;color:var(--navy)}
+
+.enforce-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;border-left:4px solid}
+.enforce-card.red{border-left-color:var(--red);background:var(--red-bg)}
+.enforce-card.amber{border-left-color:var(--amber);background:var(--amber-bg)}
+.enforce-card.purple{border-left-color:var(--purple);background:var(--purple-bg)}
+
+/* ── FOOTER ── */
+.footer{background:var(--navy);padding:24px;text-align:center;margin-top:40px}
+.footer-text{color:#7BA7D4;font-size:12px;margin-bottom:4px}
+.footer-email{color:var(--accent);font-size:13px;font-weight:600}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .months-grid{grid-template-columns:1fr 1fr}
+  .month-card:nth-child(2n){border-right:none}
+  .hero-stats{gap:16px}
+  .tabs .tab .tab-icon{display:none}
+  .module-bar{flex-wrap:wrap;justify-content:flex-start;gap:4px}
+  .module-btn{font-size:12px;padding:6px 14px}
+  .cert-card{padding:24px 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="logo">BR</div>
+    <span class="topbar-title">ByteRidge · Security Awareness Hub</span>
+  </div>
+  <div class="topbar-right">
+    <span class="month-pill">Month 1 Active</span>
+  </div>
+</header>
+
+<!-- MODULE SWITCHER -->
+<div class="module-bar">
+  <button class="module-btn active" onclick="switchModule('annual',this)">
+    🗺 Annual Programme <span class="mbadge">12 months</span>
+  </button>
+  <button class="module-btn" onclick="switchModule('soc2',this)">
+    🔐 SOC 2 Training <span class="mbadge">Compliance</span>
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- MODULE 1: ANNUAL PROGRAMME (index.html)               -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="module active" id="module-annual">
+
+  <section class="hero">
+    <div class="hero-badge">Annual Security Awareness Programme</div>
+    <h1 class="hero-title">ByteRidge <span>Cybersecurity</span><br>Awareness Hub</h1>
+    <p class="hero-desc">Your organisation-wide security training platform. 12 months of quizzes, phishing simulations, tips, and advisories — all in one place.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-val">12</div><div class="hstat-lbl">Monthly Modules</div></div>
+      <div class="hstat"><div class="hstat-val">60+</div><div class="hstat-lbl">Quiz Questions</div></div>
+      <div class="hstat"><div class="hstat-val">6</div><div class="hstat-lbl">Email Simulations</div></div>
+      <div class="hstat"><div class="hstat-val">48</div><div class="hstat-lbl">Security Tips</div></div>
+    </div>
+  </section>
+
+  <main class="main">
+    <!-- TABS -->
+    <div class="tabs" role="tablist">
+      <button class="tab active" onclick="showTab('roadmap',this)" role="tab"><span class="tab-icon">🗺</span>Roadmap</button>
+      <button class="tab" onclick="showTab('quiz',this)" role="tab"><span class="tab-icon">🧠</span>Quiz</button>
+      <button class="tab" onclick="showTab('sim',this)" role="tab"><span class="tab-icon">📧</span>Phishing Sim</button>
+      <button class="tab" onclick="showTab('tips',this)" role="tab"><span class="tab-icon">💡</span>Tips</button>
+      <button class="tab" onclick="showTab('cheatsheet',this)" role="tab"><span class="tab-icon">📋</span>Cheat Sheet</button>
+    </div>
+
+    <!-- ROADMAP -->
+    <div class="section active" id="tab-roadmap">
+      <div class="info-banner">
+        <div class="adv-icon">📅</div>
+        <div>
+          <div class="adv-title">Month 1 is currently active — Phishing Awareness</div>
+          <div class="adv-text">Click any month below to see its training initiatives, deliverables, and jump directly to the quiz or tips for that topic.</div>
+        </div>
+      </div>
+      <div id="roadmap-root"></div>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="section" id="tab-quiz">
+      <div class="advisory">
+        <div class="adv-icon">🎯</div>
+        <div>
+          <div class="adv-title">Select a month and test your knowledge</div>
+          <div class="adv-text">Complete the quiz for each month to earn your badge. Instant feedback after every answer.</div>
+        </div>
+      </div>
+      <div class="month-selector" id="quiz-month-nav"></div>
+      <div id="quiz-root"></div>
+    </div>
+
+    <!-- PHISHING SIM -->
+    <div class="section" id="tab-sim">
+      <div class="advisory">
+        <div class="adv-icon">⚠️</div>
+        <div>
+          <div class="adv-title">Phishing Email Simulator</div>
+          <div class="adv-text">Each email below is either a phishing attempt or a legitimate message. Read carefully — then decide. Your score is tracked for this session.</div>
+        </div>
+      </div>
+      <div class="sim-header">
+        <div class="sim-counter" id="sim-counter">Email 1 of 6</div>
+        <div class="sim-score">
+          <div class="sim-stat"><span style="color:var(--green)" id="sim-correct">0</span><div class="label">Correct</div></div>
+          <div class="sim-stat"><span style="color:var(--red)" id="sim-wrong">0</span><div class="label">Missed</div></div>
+        </div>
+      </div>
+      <div id="sim-root"></div>
+      <button class="action-btn secondary" style="margin-top:4px" onclick="nextEmail()">Next email →</button>
+    </div>
+
+    <!-- TIPS -->
+    <div class="section" id="tab-tips">
+      <div class="info-banner">
+        <div class="adv-icon">💡</div>
+        <div>
+          <div class="adv-title">Security tips for every month</div>
+          <div class="adv-text">Select a month to browse actionable security tips. Share these with your team in meetings, Slack, or print and pin them.</div>
+        </div>
+      </div>
+      <div class="month-selector" id="tips-month-nav"></div>
+      <div id="tips-root"></div>
+    </div>
+
+    <!-- CHEAT SHEET -->
+    <div class="section" id="tab-cheatsheet">
+      <div class="info-banner">
+        <div class="adv-icon">🖨️</div>
+        <div>
+          <div class="adv-title">Printable cheat sheets for your desk</div>
+          <div class="adv-text">Click Print for any month's cheat sheet to get a print-ready A4 one-pager. Pin it to notice boards or share at team meetings.</div>
+        </div>
+      </div>
+      <div id="cheatsheet-root"></div>
+    </div>
+  </main>
+</div><!-- /module-annual -->
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- MODULE 2: SOC 2 COMPLIANCE TRAINING                   -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="module" id="module-soc2">
+
+  <section class="hero">
+    <div class="hero-badge">SOC 2 Compliance Training</div>
+    <h1 class="hero-title">Security Awareness &amp;<br><span>Compliance</span> Course</h1>
+    <p class="hero-desc">Complete all 9 sections, pass the quizzes, acknowledge our policies, and receive your compliance certificate. Timestamped completion records serve as audit evidence.</p>
+    <div class="hero-stats">
+      <div class="hstat"><div class="hstat-val">9</div><div class="hstat-lbl">Sections</div></div>
+      <div class="hstat"><div class="hstat-val">60–90</div><div class="hstat-lbl">Min (initial)</div></div>
+      <div class="hstat"><div class="hstat-val">≥80%</div><div class="hstat-lbl">Pass mark</div></div>
+      <div class="hstat"><div class="hstat-val">SOC 2</div><div class="hstat-lbl">Aligned</div></div>
+    </div>
+  </section>
+
+  <main class="main">
+
+    <!-- SOC2 NAV -->
+    <div class="soc2-nav" id="soc2-nav">
+      <button class="soc2-nav-btn active" onclick="soc2Go('s0',this)" id="snav-s0">§0 Introduction</button>
+      <button class="soc2-nav-btn" onclick="soc2Go('s1',this)" id="snav-s1">§1 Acceptable Use</button>
+      <button class="soc2-nav-btn" onclick="soc2Go('s2',this)" id="snav-s2">§2 Phishing</button>
+      <button class="soc2-nav-btn" onclick="soc2Go('s3',this)" id="snav-s3">§3 Passwords &amp; MFA</button>
+      <button class="soc2-nav-btn" onclick="soc2Go('s4',this)" id="snav-s4">§4 Data Protection</button>
+      <button class="soc2-nav-btn" onclick="soc2Go('s5',this)" id="snav-s5">§5 Endpoint</button>
+      <button class="soc2-nav-btn" onclick="soc2Go('s6',this)" id="snav-s6">§6 Incidents</button>
+      <button class="soc2-nav-btn" onclick="soc2Go('s7',this)" id="snav-s7">§7 Final Quiz</button>
+      <button class="soc2-nav-btn" onclick="soc2Go('s8',this)" id="snav-s8">§8 Certificate</button>
+      <button class="soc2-nav-btn" onclick="soc2Go('admin',this)" id="snav-admin">⚙ Admin</button>
+    </div>
+
+    <!-- ─── S0: Introduction ─── -->
+    <div class="soc2-section active" id="soc2-s0">
+      <div class="sec-hero">
+        <div class="sec-eyebrow">Section 0 · Introduction</div>
+        <div class="sec-title">Policy Acknowledgment &amp; Course Introduction</div>
+        <div class="sec-desc">Read and acknowledge the Security Awareness and BYOD policies before proceeding. Your acknowledgment is timestamped and serves as SOC 2 audit evidence.</div>
+        <span class="sec-badge audit">Audit Evidence</span>
+      </div>
+      <div class="card">
+        <div class="card-title">Why this matters</div>
+        <p style="font-size:13.5px;color:var(--muted);line-height:1.7">Security is the backbone of client trust at ByteRidge. A single breach — phishing click, mishandled file, or lost device — can compromise client data, damage our reputation, and trigger contractual liability. This training ensures every team member understands their role in keeping ByteRidge and our clients secure.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Policy Acknowledgment</div>
+        <div class="ack-form">
+          <div class="ack-field">
+            <label class="ack-label">Full name</label>
+            <input class="ack-input" id="ack-name" type="text" placeholder="e.g. Priya Sharma">
+          </div>
+          <div class="ack-field">
+            <label class="ack-label">Department</label>
+            <input class="ack-input" id="ack-dept" type="text" placeholder="e.g. Engineering">
+          </div>
+          <div class="ack-checks">
+            <label class="ack-check-item"><input type="checkbox" id="ac1"><span class="ack-check-text">I have read and understood the <strong>Security Awareness Policy</strong> and agree to comply with its requirements.</span></label>
+            <label class="ack-check-item"><input type="checkbox" id="ac2"><span class="ack-check-text">I have read and understood the <strong>BYOD Policy</strong> and the rules around personal device use for work.</span></label>
+            <label class="ack-check-item"><input type="checkbox" id="ac3"><span class="ack-check-text">I understand that non-compliance may result in disciplinary action and escalation to my manager.</span></label>
+            <label class="ack-check-item"><input type="checkbox" id="ac4"><span class="ack-check-text">I agree to complete all required training modules and quarterly refreshers as scheduled.</span></label>
+          </div>
+          <button class="ack-submit-btn" onclick="submitAck()">Submit acknowledgment</button>
+          <div class="ack-success" id="ack-success"></div>
+        </div>
+      </div>
+      <div class="sec-nav-row"><div></div><button class="sec-nav-btn primary" onclick="soc2Go('s1',document.getElementById('snav-s1'))">Next: Acceptable Use →</button></div>
+    </div>
+
+    <!-- ─── S1: Acceptable Use ─── -->
+    <div class="soc2-section" id="soc2-s1">
+      <div class="sec-hero">
+        <div class="sec-eyebrow">Section 1 · Acceptable Use</div>
+        <div class="sec-title">Acceptable Use &amp; BYOD Security</div>
+        <div class="sec-desc">Understanding what you can and cannot do on company and client systems, and how personal devices should be used at work.</div>
+      </div>
+      <div class="topics-card">
+        <div class="topics-title">Key topics</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Personal vs company data separation</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Prohibited activities on company or client systems</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Rules for using client laptops vs personal devices (BYOD)</div>
+      </div>
+      <div class="activity-card type-scorm">
+        <div class="act-icon-box">🎥</div>
+        <div class="act-body">
+          <div class="act-name">SCORM module — Open Security Training</div>
+          <div class="act-desc">Upload the Acceptable Use module from Open Security Training to Moodle. Enable completion tracking by score. Covers device hygiene, data separation, and prohibited activities.</div>
+          <div class="act-tags"><span class="act-tag">SCORM</span><span class="act-tag">Open Security Training</span><span class="act-tag">~15 min</span></div>
+        </div>
+      </div>
+      <div class="hub-quiz-wrap">
+        <div class="hub-quiz-head">
+          <div class="hub-quiz-title">Section Quiz — Acceptable Use &amp; BYOD</div>
+          <div class="hub-quiz-badge">≥ 80% to pass</div>
+        </div>
+        <div class="hub-quiz-body">
+          <div class="hub-progress-row">
+            <div class="hub-progress-label">Progress · <span id="q-progress">Question 1 of 8</span></div>
+            <div class="hub-score-label">Score: <span id="hub-q-score">0</span></div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="q-bar" style="width:0%"></div></div>
+          <div style="margin-top:14px" id="quiz-container"></div>
+        </div>
+      </div>
+      <div class="sec-nav-row">
+        <button class="sec-nav-btn" onclick="soc2Go('s0',document.getElementById('snav-s0'))">← Introduction</button>
+        <button class="sec-nav-btn primary" onclick="soc2Go('s2',document.getElementById('snav-s2'))">Next: Phishing →</button>
+      </div>
+    </div>
+
+    <!-- ─── S2: Phishing ─── -->
+    <div class="soc2-section" id="soc2-s2">
+      <div class="sec-hero">
+        <div class="sec-eyebrow">Section 2 · Phishing</div>
+        <div class="sec-title">Phishing &amp; Social Engineering</div>
+        <div class="sec-desc">Recognising email phishing, spear phishing with client-themed attacks, CEO fraud, and invoice scams.</div>
+      </div>
+      <div class="topics-card">
+        <div class="topics-title">Key topics</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Email phishing — spotting malicious links and attachments</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Spear phishing tailored to ByteRidge client contexts</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> CEO fraud and invoice scams (Business Email Compromise)</div>
+      </div>
+      <div class="activity-card type-scorm">
+        <div class="act-icon-box">🎥</div>
+        <div class="act-body">
+          <div class="act-name">Phishing awareness module + email simulator</div>
+          <div class="act-desc">Use the Phishing Sim tab in the Annual Programme module for live email practice, or link to GoPhish campaigns. Phishing simulation failures trigger mandatory retraining assignment in Moodle.</div>
+          <div class="act-tags"><span class="act-tag">SCORM</span><span class="act-tag">GoPhish</span><span class="act-tag">scenario-based</span></div>
+        </div>
+      </div>
+      <div class="info-banner">
+        <div class="adv-icon">📧</div>
+        <div>
+          <div class="adv-title">Phishing Email Simulator available</div>
+          <div class="adv-text">Switch to the Annual Programme tab → Phishing Sim to practice with 6 real-world ByteRidge-themed email scenarios right now.</div>
+        </div>
+      </div>
+      <div class="sec-nav-row">
+        <button class="sec-nav-btn" onclick="soc2Go('s1',document.getElementById('snav-s1'))">← Acceptable Use</button>
+        <button class="sec-nav-btn primary" onclick="soc2Go('s3',document.getElementById('snav-s3'))">Next: Passwords →</button>
+      </div>
+    </div>
+
+    <!-- ─── S3: Passwords & MFA ─── -->
+    <div class="soc2-section" id="soc2-s3">
+      <div class="sec-hero">
+        <div class="sec-eyebrow">Section 3 · Identity Security</div>
+        <div class="sec-title">Passwords, MFA &amp; Identity Security</div>
+        <div class="sec-desc">Strong passwords, multi-factor authentication, and credential hygiene — especially important in our environment with no centralised IAM.</div>
+      </div>
+      <div class="topics-card">
+        <div class="topics-title">Key topics</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Password hygiene — weak vs strong password examples</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> MFA importance — no centralised IAM at ByteRidge</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Credential reuse risks across SaaS apps</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> MFA setup scenarios for Office 365 and common SaaS tools</div>
+      </div>
+      <div class="activity-card type-page">
+        <div class="act-icon-box">📄</div>
+        <div class="act-body">
+          <div class="act-name">Passwords &amp; MFA reference page</div>
+          <div class="act-desc">Moodle page resource with password strength examples, MFA setup guides for Office 365, and credential reuse explainer. Also see Month 6 (Password Management) in the Annual Programme for quiz content.</div>
+          <div class="act-tags"><span class="act-tag">page resource</span><span class="act-tag">moodle</span></div>
+        </div>
+      </div>
+      <div class="sec-nav-row">
+        <button class="sec-nav-btn" onclick="soc2Go('s2',document.getElementById('snav-s2'))">← Phishing</button>
+        <button class="sec-nav-btn primary" onclick="soc2Go('s4',document.getElementById('snav-s4'))">Next: Data Protection →</button>
+      </div>
+    </div>
+
+    <!-- ─── S4: Data Protection ─── -->
+    <div class="soc2-section" id="soc2-s4">
+      <div class="sec-hero">
+        <div class="sec-eyebrow">Section 4 · Data Protection</div>
+        <div class="sec-title">Client Data Protection &amp; Handling</div>
+        <div class="sec-desc">The highest-risk area for ByteRidge given client engagement contexts. Every team member must understand confidentiality, data classification, and device rules.</div>
+        <span class="sec-badge critical">Critical for ByteRidge</span>
+      </div>
+      <div class="topics-card">
+        <div class="topics-title">Key topics</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Client data confidentiality obligations</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Data classification: public / internal / confidential</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Screenshot and copy-paste risks</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Rules for working on client-managed systems</div>
+      </div>
+      <div class="advisory">
+        <div class="adv-icon">⚠️</div>
+        <div>
+          <div class="adv-title">Scenario — Is this allowed?</div>
+          <div class="adv-text">"I downloaded a client report to my personal laptop to finish work over the weekend — it's encrypted." → <strong>Not allowed.</strong> Client data must never leave approved systems regardless of encryption, duration, or device type. This is a policy violation and potential breach.</div>
+        </div>
+      </div>
+      <div class="activity-card type-page">
+        <div class="act-icon-box">📄</div>
+        <div class="act-body">
+          <div class="act-name">Data classification and handling policy page</div>
+          <div class="act-desc">Moodle page resource covering all three classification tiers, handling rules per tier, and real-world examples from client engagement contexts specific to ByteRidge.</div>
+          <div class="act-tags"><span class="act-tag">page resource</span><span class="act-tag">policy</span><span class="act-tag">scenario-based quiz</span></div>
+        </div>
+      </div>
+      <div class="sec-nav-row">
+        <button class="sec-nav-btn" onclick="soc2Go('s3',document.getElementById('snav-s3'))">← Passwords</button>
+        <button class="sec-nav-btn primary" onclick="soc2Go('s5',document.getElementById('snav-s5'))">Next: Endpoint →</button>
+      </div>
+    </div>
+
+    <!-- ─── S5: Endpoint & Remote Work ─── -->
+    <div class="soc2-section" id="soc2-s5">
+      <div class="sec-hero">
+        <div class="sec-eyebrow">Section 5 · Endpoint Security</div>
+        <div class="sec-title">Endpoint &amp; Remote Work Security</div>
+        <div class="sec-desc">Securing your device and connection whether you're working from home, a client site, or a café.</div>
+      </div>
+      <div class="topics-card">
+        <div class="topics-title">Key topics</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Secure WiFi — public vs home vs corporate network</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> VPN expectations for remote access</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Browser security risks and extension vetting</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Device patching responsibility (especially BYOD users)</div>
+      </div>
+      <div class="activity-card type-scorm">
+        <div class="act-icon-box">🎥</div>
+        <div class="act-body">
+          <div class="act-name">Endpoint &amp; remote work awareness module</div>
+          <div class="act-desc">Covers remote work attack surfaces, VPN use, BYOD patch responsibilities, and browser hygiene. Also see Month 5 (Secure Remote Work) in the Annual Programme module for additional quiz content.</div>
+          <div class="act-tags"><span class="act-tag">SCORM</span><span class="act-tag">video</span><span class="act-tag">~10 min</span></div>
+        </div>
+      </div>
+      <div class="sec-nav-row">
+        <button class="sec-nav-btn" onclick="soc2Go('s4',document.getElementById('snav-s4'))">← Data Protection</button>
+        <button class="sec-nav-btn primary" onclick="soc2Go('s6',document.getElementById('snav-s6'))">Next: Incidents →</button>
+      </div>
+    </div>
+
+    <!-- ─── S6: Incident Reporting ─── -->
+    <div class="soc2-section" id="soc2-s6">
+      <div class="sec-hero">
+        <div class="sec-eyebrow">Section 6 · Incident Response</div>
+        <div class="sec-title">Incident Reporting &amp; Response</div>
+        <div class="sec-desc">When something goes wrong — a suspicious email, lost device, or accidental data exposure — you need to know exactly what to do and who to contact.</div>
+        <span class="sec-badge audit">Audit Evidence</span>
+      </div>
+      <div class="topics-card">
+        <div class="topics-title">Key topics</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> How to report a phishing email — forward + notify</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Lost or stolen device procedure</div>
+        <div class="topic-item"><span class="topic-arrow">→</span> Escalation channels: email / Slack / Teams</div>
+      </div>
+      <div class="activity-card type-page">
+        <div class="act-icon-box">📄</div>
+        <div class="act-body">
+          <div class="act-name">How to report incidents — reference page</div>
+          <div class="act-desc">Add your actual security email ID, Slack channel, and Teams contact to this Moodle page. Must be verified and updated at each quarterly refresh cycle.</div>
+          <div class="act-tags"><span class="act-tag">page resource</span><span class="act-tag">escalation path</span><span class="act-tag">update quarterly</span></div>
+        </div>
+      </div>
+      <div class="card" style="border-left:4px solid var(--red)">
+        <div class="card-title">ByteRidge 3-step incident response</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:4px">
+          <div style="background:var(--red-bg);border-radius:8px;padding:12px;border-top:3px solid var(--red)"><div style="font-weight:700;color:var(--red);font-size:12px;margin-bottom:4px">STEP 1 — STOP</div><div style="font-size:12px;color:var(--muted);line-height:1.5">Do not click links, open attachments, or reply. Even replying confirms your email is active.</div></div>
+          <div style="background:var(--amber-bg);border-radius:8px;padding:12px;border-top:3px solid var(--amber)"><div style="font-weight:700;color:var(--amber);font-size:12px;margin-bottom:4px">STEP 2 — REPORT</div><div style="font-size:12px;color:var(--muted);line-height:1.5">Forward to security@byteridge.in. Do NOT delete — headers are needed for investigation.</div></div>
+          <div style="background:var(--green-bg);border-radius:8px;padding:12px;border-top:3px solid var(--green)"><div style="font-weight:700;color:var(--green);font-size:12px;margin-bottom:4px">STEP 3 — VERIFY</div><div style="font-size:12px;color:var(--muted);line-height:1.5">Contact the apparent sender via phone or Slack — never using contact details from the suspicious email.</div></div>
+        </div>
+      </div>
+      <div class="sec-nav-row">
+        <button class="sec-nav-btn" onclick="soc2Go('s5',document.getElementById('snav-s5'))">← Endpoint</button>
+        <button class="sec-nav-btn primary" onclick="soc2Go('s7',document.getElementById('snav-s7'))">Go to Final Assessment →</button>
+      </div>
+    </div>
+
+    <!-- ─── S7: Final Assessment ─── -->
+    <div class="soc2-section" id="soc2-s7">
+      <div class="sec-hero">
+        <div class="sec-eyebrow">Section 7 · Final Assessment</div>
+        <div class="sec-title">Final Compliance Assessment</div>
+        <div class="sec-desc">Questions drawn from all six topic areas. You need ≥ 80% to pass. 2 attempts allowed. Read each scenario carefully before answering.</div>
+        <span class="sec-badge cert">≥ 80% to pass</span>
+      </div>
+      <div class="hub-quiz-wrap">
+        <div class="hub-quiz-head">
+          <div class="hub-quiz-title">SOC 2 Compliance Assessment — All Sections</div>
+          <div class="hub-quiz-badge">≥ 80% to pass</div>
+        </div>
+        <div class="hub-quiz-body">
+          <div class="hub-progress-row">
+            <div class="hub-progress-label">Progress · <span id="q-progress-final">Question 1</span></div>
+            <div class="hub-score-label">Score: <span id="hub-q-score-final">0</span></div>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="q-bar-final" style="width:0%"></div></div>
+          <div style="margin-top:14px" id="quiz-container-final"></div>
+        </div>
+      </div>
+      <div class="sec-nav-row">
+        <button class="sec-nav-btn" onclick="soc2Go('s6',document.getElementById('snav-s6'))">← Incidents</button>
+        <button class="sec-nav-btn primary" onclick="soc2Go('s8',document.getElementById('snav-s8'))">View Certificate →</button>
+      </div>
+    </div>
+
+    <!-- ─── S8: Certificate ─── -->
+    <div class="soc2-section" id="soc2-s8">
+      <div class="cert-wrap">
+        <div class="cert-card">
+          <div class="cert-eyebrow">Certificate of Completion</div>
+          <div class="cert-h">Security Awareness Training</div>
+          <div class="cert-sub">This certifies that</div>
+          <div class="cert-name" id="cert-name">Your Name</div>
+          <div class="cert-course">Security Awareness &amp; Compliance — SOC 2 Aligned</div>
+          <div class="cert-course" style="font-weight:400;color:var(--muted);font-size:13px;margin-top:2px">ByteRidge Technologies</div>
+          <div class="cert-date" id="cert-date" style="margin-top:8px">Issued: —</div>
+          <div class="cert-divider"></div>
+          <div class="cert-id" id="cert-id">Certificate ID: complete all sections to generate</div>
+        </div>
+        <div class="cert-btns">
+          <button class="action-btn primary" onclick="window.print()">🖨 Print / Save PDF</button>
+          <button class="action-btn secondary" onclick="soc2Go('admin',document.getElementById('snav-admin'))">Moodle Config →</button>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:10px;text-align:center">Complete Section 0 acknowledgment and pass the final assessment to unlock your certificate.</p>
+      </div>
+    </div>
+
+    <!-- ─── ADMIN: Moodle Config ─── -->
+    <div class="soc2-section" id="soc2-admin">
+      <div class="sec-hero">
+        <div class="sec-eyebrow">Admin Reference</div>
+        <div class="sec-title">Moodle Configuration &amp; SOC 2 Setup</div>
+        <div class="sec-desc">Critical settings for your LMS admin. Keep this accessible during Moodle setup and at each quarterly refresh.</div>
+      </div>
+      <div class="card-title" style="margin-bottom:12px">Critical Moodle settings</div>
+      <div class="config-grid">
+        <div class="config-cell"><div class="config-key">Completion tracking</div><div class="config-val">Per-activity + course-level</div></div>
+        <div class="config-cell"><div class="config-key">Section quiz weight</div><div class="config-val">60% of gradebook</div></div>
+        <div class="config-cell"><div class="config-key">Final assessment weight</div><div class="config-val">40% of gradebook</div></div>
+        <div class="config-cell"><div class="config-key">Pass threshold</div><div class="config-val">≥ 80% (all quizzes)</div></div>
+        <div class="config-cell"><div class="config-key">Acknowledgment quiz</div><div class="config-val">100% — log all attempts</div></div>
+        <div class="config-cell"><div class="config-key">Final quiz attempts</div><div class="config-val">2 attempts allowed</div></div>
+        <div class="config-cell"><div class="config-key">Question bank</div><div class="config-val">5 categories, randomized</div></div>
+        <div class="config-cell"><div class="config-key">Reporting cadence</div><div class="config-val">Monthly export</div></div>
+      </div>
+      <div class="card-title" style="margin-bottom:12px">Enforcement layer</div>
+      <div class="enforce-card red"><div style="font-size:18px">🚨</div><div><strong style="color:var(--red)">Non-completion</strong><br><span style="font-size:13px;color:var(--muted)">Escalate to manager after deadline. Log in compliance tracker. Block access renewal if applicable.</span></div></div>
+      <div class="enforce-card amber"><div style="font-size:18px">⚠️</div><div><strong style="color:var(--amber)">Failed phishing simulation</strong><br><span style="font-size:13px;color:var(--muted)">Auto-assign phishing module retrain in Moodle. Track in GoPhish + compliance sheet.</span></div></div>
+      <div class="enforce-card purple"><div style="font-size:18px">🔁</div><div><strong style="color:var(--purple)">Repeat offenders</strong><br><span style="font-size:13px;color:var(--muted)">Flag in monthly compliance report. Escalate to HR or management for formal review.</span></div></div>
+      <div style="margin-top:16px">
+        <div class="card-title" style="margin-bottom:12px">Quarterly refresh checklist</div>
+        <div class="card">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="topic-item"><span class="topic-arrow">→</span> Clone base course in Moodle</div>
+            <div class="topic-item"><span class="topic-arrow">→</span> Replace 1–2 SCORM modules with updated content</div>
+            <div class="topic-item"><span class="topic-arrow">→</span> Add new phishing scenarios from GoPhish data</div>
+            <div class="topic-item"><span class="topic-arrow">→</span> Add 5–10 new questions to question bank</div>
+            <div class="topic-item"><span class="topic-arrow">→</span> Verify incident reporting channels are current</div>
+            <div class="topic-item"><span class="topic-arrow">→</span> Export completion and score reports</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div><!-- /module-soc2 -->
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-text">ByteRidge Technologies · Security Awareness Programme · Confidential – Internal</div>
+  <div class="footer-email">security@byteridge.in</div>
+  <div class="footer-text" style="margin-top:6px;font-size:11px">Report suspicious emails immediately. Never click unverified links. Stay alert.</div>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  MODULE SWITCHER
+// ════════════════════════════════════════════════════════
+function switchModule(id, btn){
+  document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+  document.querySelectorAll('.module-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('module-'+id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+
+const MONTHS = [
+  { q:1,m:1,title:"Phishing Awareness",theme:"New Security Habits",color:"#2176FF",
+    initiatives:["Promote awareness of phishing risks and common attack vectors","Distribute Security Advisory BYT-SEC-ADV-001 to all staff","Host webinar: Phishing Awareness and Prevention (35 min)","Launch Month 1 phishing quiz on Security Awareness Hub","Conduct simulated phishing drill and measure click rates"],
+    deliverables:["Advisory","Quiz","Webinar","Simulation","Cheat Sheet"],
+    tips:[
+      {c:"blue",i:"🔒",t:"Check the actual sender domain",d:"Display names can be faked. Always expand and verify the real email address. @byteridge-alerts.net is NOT @byteridge.in."},
+      {c:"red",i:"⚠️",t:"Urgency is a manipulation tactic",d:"'Your account expires in 4 hours!' Manufactured pressure is an attacker's signature. Pause before acting on any urgent email."},
+      {c:"blue",i:"🔍",t:"Hover before you click",d:"Hold your cursor over any link to preview the destination URL. If it doesn't point to a domain you recognise — don't click."},
+      {c:"green",i:"🛡️",t:"Enable MFA on every account",d:"Multi-factor authentication blocks 99.9% of automated attacks even after a password is stolen. Enable it on email, VPN, and all key systems."},
+      {c:"red",i:"📎",t:"Never open unexpected attachments",d:"PDF, DOCX, ZIP from unknown senders — always verify first. Never enable macros on files you didn't specifically request."},
+      {c:"amber",i:"📢",t:"Report to security@byteridge.in",d:"Do NOT delete suspicious emails. Forward them so the security team can investigate and protect your colleagues."},
+    ],
+    quiz:[
+      {q:"An email from 'IT Support <helpdesk@byteridge-it-support.net>' asks you to verify your login. What should you do?",o:["Update details immediately","Ignore it — looks fine","Forward to security@byteridge.in, do NOT click any link","Reply to ask if it is legitimate"],c:2,e:"The domain byteridge-it-support.net is NOT byteridge.in. Lookalike domains are a classic phishing technique. Always verify through official channels."},
+      {q:"Hovering over a link shows: http://secure-byteridge-login.xyz/auth — is this safe to click?",o:["Yes — 'secure' is in the URL","Yes — it mentions ByteRidge","No — .xyz is not byteridge.in","Only if your antivirus is active"],c:2,e:"The actual domain is secure-byteridge-login.xyz — not byteridge.in. The words 'secure' or 'ByteRidge' in a URL mean nothing. Always check the domain after the last dot before the first slash."},
+      {q:"A colleague WhatsApps you urgently asking you to share a client credentials file. What do you do?",o:["Send immediately — it's a trusted colleague","Send and tell your manager after","Call or meet them directly to verify first","Ask them to email you instead"],c:2,e:"This is social engineering. Verify urgent sensitive requests via a completely separate channel — a voice call or face-to-face. Never transfer sensitive data based on a chat message alone."},
+      {q:"What does HTTPS in a website URL actually guarantee?",o:["The site is safe and legitimate","Your connection is encrypted","The company behind it is verified","The site cannot steal your data"],c:1,e:"HTTPS only encrypts the connection — not that the site is trustworthy. Phishing sites use HTTPS too. You can have a fully encrypted connection to a malicious site."},
+      {q:"You receive a PDF from an unknown sender. It says 'Enable Editing to view content.' What do you do?",o:["Enable it — the content looks important","Enable it if your antivirus is active","Close immediately and report to IT","Save and reopen in a different app"],c:2,e:"'Enable Editing/Macros' prompts are one of the most common malware delivery vectors. Legitimate documents never require macros to display content. Close and report immediately."},
+      {q:"What is the FIRST step in the ByteRidge phishing response?",o:["Delete the email","Reply asking for clarification","Stop — do not interact with the email at all","Forward it to all colleagues as a warning"],c:2,e:"STOP is always first. Do not click, reply, or forward. Even replying confirms your email is active and monitored. Next step: report to security@byteridge.in."},
+      {q:"Which provides the BEST protection for your accounts?",o:["A long password changed monthly","Unique 12+ character password + MFA","Same strong password across accounts","Fingerprint login only"],c:1,e:"Unique passwords prevent credential stuffing attacks. MFA blocks access even when the password is stolen. Together they stop over 99% of automated account attacks."},
+      {q:"How do you verify if an email 'from HR' requesting your bank details is legitimate?",o:["It ends in @byteridge.in so it's fine","Check with a colleague who got the same email","Call HR on the number from the official intranet — not from the email","Click the link but don't enter your password"],c:2,e:"Email addresses can be spoofed. The ONLY safe method: contact HR through a channel you already trust — the intranet number — not any contact detail inside the suspicious email."},
+    ]
+  },
+  { q:1,m:2,title:"Data Privacy",theme:"Foundations & Continuity",color:"#1A4A8A",
+    initiatives:["Provide overview of data privacy laws applicable to ByteRidge (IT Act, PDPB)","Share best practices for identifying and reporting data breaches","Conduct privacy awareness webinar (30 min)","Distribute Data Privacy Advisory BYT-SEC-ADV-002","Quiz on data classification and handling procedures"],
+    deliverables:["Advisory","Quiz","Webinar","Policy Review"],
+    tips:[
+      {c:"blue",i:"📁",t:"Classify data before sharing",d:"Not all data is equal. Client PII, financial records, and credentials must be handled differently from general company information."},
+      {c:"red",i:"🚨",t:"Report breaches within 72 hours",d:"Under PDPB and client contracts, breach notification has strict time limits. Report any suspected breach to security@byteridge.in immediately — do not wait."},
+      {c:"green",i:"🗑️",t:"Delete data you no longer need",d:"Data you don't hold cannot be stolen. Regularly review and delete sensitive data no longer required for active work."},
+      {c:"amber",i:"📧",t:"Never email sensitive data unencrypted",d:"Client PII, financial data, and credentials should never be sent in plain email. Use the company's secure file transfer system."},
+    ],
+    quiz:[
+      {q:"Which data type requires the highest protection at ByteRidge?",o:["Public marketing materials","Client PII and financial records","Internal meeting notes","Employee birthdays"],c:1,e:"Client PII and financial records carry the highest regulatory and contractual obligations. Mishandling them can cause serious legal, financial, and reputational damage."},
+      {q:"You accidentally sent client personal data to the wrong email address. What do you do?",o:["Hope it wasn't noticed","Delete the sent email and say nothing","Report to security@byteridge.in immediately","Ask the recipient to delete it and leave it at that"],c:2,e:"This is a data breach and must be reported immediately. Under PDPB, organisations have limited time to notify affected parties. Prompt reporting allows the team to contain and limit damage."},
+      {q:"What does 'data minimisation' mean in practice?",o:["Keeping file sizes small","Only collecting data that is strictly necessary for a specific purpose","Minimising who can see data","Deleting all data monthly"],c:1,e:"Data minimisation means only collecting, processing, and retaining data that is strictly necessary for the stated purpose. It limits exposure and is a core privacy-by-design principle."},
+      {q:"What is the safest way to share a large file containing client data with a colleague?",o:["Email with a password in the same email","WhatsApp","Company-approved secure file transfer system","USB drive"],c:2,e:"Only company-approved secure file transfer systems provide audit trails, access controls, and encryption at rest and in transit — essential for sensitive data."},
+    ]
+  },
+  { q:1,m:3,title:"Business Continuity",theme:"Foundations & Continuity",color:"#1A7A4A",
+    initiatives:["Facilitate tabletop exercise: simulate a ransomware incident response","Conduct emergency response training for department leads","Distribute BCP advisory covering recovery priorities","Review and test backup and recovery procedures","Identify and document critical business functions and RTOs"],
+    deliverables:["Advisory","Tabletop Exercise","Emergency Training","BCP Review"],
+    tips:[
+      {c:"blue",i:"💾",t:"Know where your backups are",d:"If ransomware hits, recovery speed depends on backup availability. Know your backup location and confirm they are tested and working."},
+      {c:"green",i:"📞",t:"Know your incident response contacts",d:"Who do you call at 2am if systems go down? Every team member should know the emergency contact chain before an incident occurs."},
+      {c:"red",i:"🔄",t:"Test your recovery procedures",d:"A backup you've never tested is a backup you don't actually have. Schedule regular recovery drills — not just scheduled backups."},
+      {c:"amber",i:"📋",t:"Document critical business functions",d:"Which processes cannot stop for more than 4 hours? 24 hours? Documenting these priorities makes recovery faster and decision-making clearer during a crisis."},
+    ],
+    quiz:[
+      {q:"What is the primary goal of a Business Continuity Plan (BCP)?",o:["To prevent all incidents from occurring","To ensure critical business functions continue during and after disruption","To assign blame after an incident","To satisfy auditors and compliance teams"],c:1,e:"A BCP's core purpose is ensuring that critical operations can continue or be quickly restored during disruption — not to prevent incidents but to minimise their impact."},
+      {q:"During a ransomware attack, your first action should be to:",o:["Pay the ransom to recover data","Try to decrypt files yourself","Isolate the affected system and call IT immediately","Continue working and report later"],c:2,e:"Speed of isolation is critical. Every minute a connected infected system stays online allows ransomware to spread. Disconnect immediately, then escalate to IT."},
+      {q:"How frequently should backup recovery procedures be tested?",o:["Only when a real incident occurs","At least annually, ideally quarterly","Never — if the backup runs, it works","Only when compliance requires it"],c:1,e:"Untested backups frequently fail when needed most. Regular recovery testing — at least annually, ideally quarterly — ensures backups are complete, uncorrupted, and recoverable within required time."},
+    ]
+  },
+  { q:2,m:4,title:"Physical Security",theme:"Physical & Remote Access",color:"#8B5CF6",
+    initiatives:["Conduct emergency evacuation and lockdown drills","Organise sessions on protecting physical access points","Train staff on tailgating and people risk management","Distribute Physical Security Advisory","Audit visitor management and access card procedures"],
+    deliverables:["Advisory","Drill","Training Session","Access Audit"],
+    tips:[
+      {c:"red",i:"🚪",t:"Never let someone tailgate through a secured door",d:"Tailgating is one of the most common physical security breaches. Always verify identity before allowing entry — even if the person seems familiar."},
+      {c:"blue",i:"🪪",t:"Wear and display your access card at all times",d:"Wearing your badge visibly helps colleagues identify authorised personnel. If you see someone without a badge in a restricted area — ask or report."},
+      {c:"amber",i:"🖥️",t:"Lock your screen when you leave your desk",d:"Win+L on Windows, Cmd+Control+Q on Mac. An unlocked screen is an open door. Make it a reflex — every time, without exception."},
+      {c:"green",i:"🗑️",t:"Shred sensitive documents — never bin them",d:"Dumpster diving is a real attack technique. Any document with names, account numbers, or project details should be shredded, not thrown in a waste bin."},
+    ],
+    quiz:[
+      {q:"What is 'tailgating' in the context of physical security?",o:["Following someone on social media","Entering a secured area by following an authorised person without separate authentication","A type of phishing attack","Accessing systems remotely without a VPN"],c:1,e:"Tailgating is a physical security breach where an unauthorised person enters a secured area by following an authorised person through a door. Never hold a secured door for someone you haven't verified."},
+      {q:"You see an unfamiliar person in the server room without a visible badge. You should:",o:["Ignore them — probably a contractor","Take a photo and post on the company chat","Politely ask who they are and verify with reception or IT","Wait to see if a colleague recognises them"],c:2,e:"Physical security is everyone's responsibility. Politely but firmly challenging unidentified individuals in sensitive areas is the correct response — most organisations specifically train staff to do this."},
+    ]
+  },
+  { q:2,m:5,title:"Secure Remote Work",theme:"Physical & Remote Access",color:"#0891B2",
+    initiatives:["Share remote work security best practices with all staff","Promote MFA activation on all remote access tools","Host webinar: Secure Remote Work and VPN hygiene (30 min)","Audit home network guidance distribution","Review and update the Remote Work Security Policy"],
+    deliverables:["Advisory","Webinar","MFA Campaign","Policy Update"],
+    tips:[
+      {c:"blue",i:"🔐",t:"Always use VPN when outside the office",d:"Your home broadband and public Wi-Fi do not have ByteRidge's security controls. Always connect to VPN before accessing any company resource remotely."},
+      {c:"red",i:"📶",t:"Never use public Wi-Fi for work without VPN",d:"Coffee shops, airports, hotels — all these networks are unsecured. Anyone on the same network can potentially intercept your traffic."},
+      {c:"green",i:"💻",t:"Keep work and personal devices separate",d:"Don't access company systems on personal devices without MDM enrollment. Personal devices may lack required security controls and patch levels."},
+      {c:"amber",i:"🏠",t:"Secure your home router",d:"Change the default router password. Enable WPA3/WPA2. Disable remote management. An insecure home router is a potential attack vector."},
+    ],
+    quiz:[
+      {q:"Why is a VPN essential when working remotely?",o:["It makes your internet connection faster","It encrypts your traffic and routes it through ByteRidge's secure network","It automatically backs up your files","It prevents device infection by viruses"],c:1,e:"A VPN encrypts all traffic between your device and the company network, preventing interception on untrusted networks and ensuring company security policies apply to your session."},
+      {q:"You're at a café and need to check urgent email. Public Wi-Fi is available. You should:",o:["Connect — it's faster","Connect and manually enable HTTPS","Use your mobile hotspot or connect via VPN before accessing email","Wait until you reach a secure network"],c:2,e:"Public Wi-Fi is unencrypted and shared. Always use your mobile hotspot (a private encrypted connection) or connect via VPN first if you must use public Wi-Fi."},
+    ]
+  },
+  { q:2,m:6,title:"Password Management",theme:"Physical & Remote Access",color:"#BA7517",
+    initiatives:["Promote strong password guidelines and password manager adoption","Advisory session on password protection and credential hygiene","Host webinar: Protecting sensitive information and credentials (30 min)","Mandate password manager evaluation for all staff","Audit and enforce password policy compliance"],
+    deliverables:["Advisory","Webinar","Password Manager Eval","Policy Audit"],
+    tips:[
+      {c:"blue",i:"🔑",t:"Use a password manager",d:"Bitwarden, 1Password, or Dashlane generate and store unique strong passwords for every account. You only remember one master password. Use it."},
+      {c:"red",i:"🚫",t:"Never reuse passwords across accounts",d:"If one site is breached, attackers try those credentials everywhere (credential stuffing). Unique passwords per account stop this attack completely."},
+      {c:"green",i:"📏",t:"Length beats complexity",d:"A 20-character passphrase like 'coffee-monitor-tiger-78' is far stronger than 'P@ssw0rd1' and much easier to remember."},
+      {c:"amber",i:"🔄",t:"Change passwords after any breach notification",d:"If any service reports a breach, change that password immediately — and check everywhere else you may have reused it."},
+    ],
+    quiz:[
+      {q:"Which is the strongest password?",o:["P@ssw0rd1!","correct-horse-battery-staple-2024","ByteRidge2024!","Admin@123"],c:1,e:"Length is the most critical factor. 'correct-horse-battery-staple-2024' is 33 characters — vastly harder to crack than any short complex password, and easier to remember."},
+      {q:"What is credential stuffing?",o:["Using the same password on multiple sites","Attackers trying breach-leaked credentials on other services","Creating very complex passwords","Filling credentials into a password manager"],c:1,e:"Credential stuffing: attackers take username/password pairs from one data breach and try them on hundreds of other services automatically. Unique passwords per site make this attack completely ineffective."},
+      {q:"You receive a 'Have I Been Pwned' alert for an old account. You should:",o:["Ignore it — it's an old account","Change the password on that site only","Change that password and check everywhere you used the same one","Only act if you used that account recently"],c:2,e:"If that password was reused anywhere, all those accounts are now at risk. Change the compromised password and audit every other account that shared it."},
+    ]
+  },
+  { q:3,m:7,title:"Social Engineering",theme:"The Human Element",color:"#639922",
+    initiatives:["Role-play social engineering scenarios: pretexting, baiting, quid pro quo","Share social engineering advisory tips with all staff","Conduct interactive awareness sessions by department","Distribute Social Engineering Advisory BYT-SEC-ADV-007","Test staff with a simulated social engineering phone call"],
+    deliverables:["Advisory","Role-Play Workshop","Interactive Session","Simulated Call"],
+    tips:[
+      {c:"red",i:"🎭",t:"Pretexting — verify before trusting any story",d:"'I'm from the IT audit team and need your credentials.' Anyone can claim any role. Always verify identity through official channels before complying with any request."},
+      {c:"amber",i:"🎁",t:"Beware baiting — nothing is actually free",d:"A USB drive found in the car park, a 'free gift' requiring account access — these are baiting attacks designed to compromise your system or credentials."},
+      {c:"blue",i:"📞",t:"Vishing — phone-based social engineering",d:"Callers claiming to be IT support, bank fraud teams, or senior management asking for OTPs or remote access. Hang up and call back on a number you already know and trust."},
+      {c:"green",i:"🤝",t:"Authority pressure is a manipulation tactic",d:"'The CEO needs this right now' creates pressure to bypass normal procedures. Legitimate urgency can always survive a 2-minute verification call."},
+    ],
+    quiz:[
+      {q:"A caller says they are from IT support and need your Windows password to fix a critical issue. You should:",o:["Give it — IT support needs it to help you","Ask them to verify with your manager first","Hang up and call IT back on the intranet number","Give them a temporary password instead"],c:2,e:"IT support will never need your personal password to fix any issue. Hang up and call back using a number you already have and trust — this confirms the identity of the caller."},
+      {q:"You find a USB drive in the ByteRidge car park labelled 'Q4 Salaries'. What do you do?",o:["Plug it in to see who it belongs to","Hand it to IT security without plugging it in","Ask around the office if anyone lost it","Leave it where you found it"],c:1,e:"This is a classic baiting attack. Plugging in an unknown USB drive can silently install malware in seconds. Always hand unknown storage devices to IT security without connecting them to any device."},
+    ]
+  },
+  { q:3,m:8,title:"Mobile Security",theme:"The Human Element",color:"#D85A30",
+    initiatives:["Share best practices for mobile device security with all staff","Distribute Mobile Security Advisory BYT-SEC-ADV-008","Conduct training on BYOD policy and MDM enrollment","Review mobile device acceptable use policy","Address app vetting and public Wi-Fi risks on mobile"],
+    deliverables:["Advisory","Training Session","MDM Drive","Policy Review"],
+    tips:[
+      {c:"blue",i:"📱",t:"Enable full-device encryption on mobile",d:"Both iOS and Android support full-device encryption. Ensure it is enabled on any device used for work. A lost phone without encryption is a data breach."},
+      {c:"red",i:"📲",t:"Only install apps from official stores",d:"Sideloaded apps bypass security reviews. Only install from the App Store or Play Store, and only apps your organisation has approved for work use."},
+      {c:"green",i:"🔒",t:"Use a strong PIN or biometric lock",d:"Minimum 6-digit PIN, or biometric. Avoid pattern locks — they leave smudge traces. Set auto-lock to 30 seconds for work devices."},
+      {c:"amber",i:"📡",t:"Turn off Wi-Fi and Bluetooth when not in use",d:"Both can be attack vectors in public spaces. Turn them off when you don't need them — especially in airports, hotels, and conferences."},
+    ],
+    quiz:[
+      {q:"What should you do if your company phone is lost or stolen?",o:["Buy a new one and restore from backup","Report to IT immediately so it can be remotely wiped","Try to find it before reporting","Only report if you had sensitive data on it"],c:1,e:"Report immediately. IT can trigger a remote wipe to protect company data. Every hour of delay increases risk. Company email and accounts on the device are all exposed until it is wiped."},
+      {q:"A free 'unlimited VPN' app on the Play Store has great reviews. You should:",o:["Install it — it's free and useful","Install it for personal use only","Avoid it — free VPNs frequently harvest and sell user data","Check the permissions first then decide"],c:2,e:"Free VPN apps are frequently data harvesting tools. Your traffic passes through their servers and may be logged and sold. Never use an unvetted VPN on any device with company access."},
+    ]
+  },
+  { q:3,m:9,title:"Insider Threats",theme:"The Human Element",color:"#993556",
+    initiatives:["Focus on insider threat awareness — accidental and malicious patterns","Share security culture-building initiatives with all teams","Provide insider threat advisory sessions by department","Review access control and least-privilege implementation","Introduce anomaly detection awareness for team leads"],
+    deliverables:["Advisory","Awareness Session","Access Review","Culture Initiative"],
+    tips:[
+      {c:"blue",i:"👁️",t:"Most insider threats are accidental",d:"Sending a file to the wrong person, clicking a phishing link, weak passwords — the majority of insider incidents are unintentional. Awareness training is the primary cure."},
+      {c:"red",i:"🔑",t:"Least privilege — only access what you need",d:"You should only have access to systems and data necessary for your current role. Excess access creates unnecessary risk. Report unnecessary access to IT."},
+      {c:"green",i:"🔄",t:"Offboarding access must be revoked immediately",d:"When a colleague leaves ByteRidge, their access should be revoked on their last day. If you notice a departed employee's account is still active — report it to IT immediately."},
+      {c:"amber",i:"📊",t:"Unusual behaviour is worth noting",d:"A colleague downloading large data volumes, accessing unusual systems late at night, or expressing grievances alongside policy violations — these patterns warrant a quiet conversation with management."},
+    ],
+    quiz:[
+      {q:"What percentage of insider threat incidents are accidental rather than malicious?",o:["About 10%","About 25%","Around 60–75%","Virtually all of them"],c:2,e:"Research consistently shows 60–75% of insider incidents are accidental — caused by mistakes or lack of awareness rather than malicious intent. Awareness training is the primary mitigation strategy."},
+      {q:"The principle of least privilege means:",o:["Using weaker passwords for less important systems","Only having access to systems and data required for your specific role","Giving junior staff less security training","Restricting physical access to server rooms only"],c:1,e:"Least privilege limits access to only what is strictly necessary for each person's current role. It contains the blast radius of both accidental and malicious insider incidents."},
+    ]
+  },
+  { q:4,m:10,title:"Awareness Month",theme:"Recognition & Review",color:"#E24B4A",
+    initiatives:["Conduct company-wide cybersecurity awareness sessions","Invite a guest speaker from the security industry","Share educational videos on key cybersecurity topics","Organise gamification — security awareness quiz tournament","Award prizes and recognise security champions publicly"],
+    deliverables:["Awareness Sessions","Guest Speaker","Videos","Quiz Tournament","Awards"],
+    tips:[
+      {c:"blue",i:"🏆",t:"Recognise and reward secure behaviour",d:"Security awareness is a team sport. Recognising colleagues who report phishing or complete training reinforces a positive security culture across the organisation."},
+      {c:"red",i:"🎯",t:"Security is everyone's responsibility",d:"From the CEO to the newest joinee — a single click on a phishing link can compromise the whole organisation. There are no exceptions to secure practices."},
+      {c:"green",i:"📚",t:"Stay curious about emerging threats",d:"The threat landscape changes constantly. Follow CERT-In advisories, subscribe to security newsletters, and share learnings with your team regularly."},
+      {c:"amber",i:"🌐",t:"Share security knowledge beyond the office",d:"Tell your family about phishing. Help them set up MFA. Security awareness that stops at the office door is only half the job."},
+    ],
+    quiz:[
+      {q:"Which approach builds a security-aware culture most effectively?",o:["Annual mandatory training only","Continuous varied awareness activities throughout the year","Weekly security policy reminder emails","Monitoring employee internet usage"],c:1,e:"Research shows point-in-time annual training has minimal lasting impact. Continuous, varied, and engaging activities — like this 12-month programme — are significantly more effective at changing behaviour."},
+    ]
+  },
+  { q:4,m:11,title:"Email & Phishing Advanced",theme:"Recognition & Review",color:"#185FA5",
+    initiatives:["Advanced phishing training — BEC (Business Email Compromise) and CEO fraud","Best practices for recognising and reporting suspicious emails","Email security awareness — SPF, DKIM, DMARC for staff","Conduct advanced phishing simulation and measure improvement","Review email filtering and gateway security configuration"],
+    deliverables:["Advanced Training","Simulation","Advisory","Email Security Review"],
+    tips:[
+      {c:"red",i:"💼",t:"Business Email Compromise (BEC) is highly targeted",d:"BEC attacks impersonate CEOs or CFOs requesting urgent fund transfers. They are researched, convincing, and can bypass spam filters. Always verify financial requests via phone."},
+      {c:"blue",i:"📧",t:"Understand SPF, DKIM, and DMARC",d:"These email authentication standards verify that an email genuinely came from the stated domain. Pay attention to email client warnings about failing authentication."},
+      {c:"amber",i:"🔄",t:"Reply-to can be different from From",d:"An attacker can set From: as legitimate@byteridge.in but route replies to attacker@evil.com. Always check the reply-to address before responding to any sensitive email."},
+      {c:"green",i:"🧪",t:"When in doubt — call to confirm",d:"One phone call to verify a request is worth infinitely more than the cost of a fraud or breach. This applies especially to finance, HR, and IT requests."},
+    ],
+    quiz:[
+      {q:"A Business Email Compromise (BEC) attack typically involves:",o:["Malware attached to emails","An attacker impersonating a senior executive to authorise a fraudulent transfer","A bulk phishing campaign targeting thousands","Hacking directly into the email server"],c:1,e:"BEC attacks are targeted social engineering — no malware, no suspicious links. An attacker impersonates a CEO or CFO to trick finance teams into transferring money or sharing sensitive data."},
+      {q:"An email appearing to come from your CEO requests an urgent wire transfer. You should:",o:["Process it — it's from the CEO's email","Call the CEO on a number you already know to verify","Reply asking for written confirmation","Ask your manager and process if they agree"],c:1,e:"BEC attacks often use spoofed CEO addresses. Always verify unusual financial requests via a voice call using a number from your own contacts — never from within the email itself."},
+    ]
+  },
+  { q:4,m:12,title:"Year-End Review",theme:"Recognition & Review",color:"#3B6D11",
+    initiatives:["Review all 12 months of security awareness activities and outcomes","Measure improvement in phishing simulation click rates across the year","Plan next year's security awareness programme based on findings","Recognise employee contributions — Security Champion awards ceremony","Share lessons learned and set security improvement goals for next year"],
+    deliverables:["Year-End Report","Awards Ceremony","Next Year Planning","Lessons Learned"],
+    tips:[
+      {c:"green",i:"📈",t:"Measure to improve",d:"Track phishing simulation click rates, quiz completion rates, and incident reports over the year. Improvement in these metrics shows the programme is delivering real value."},
+      {c:"blue",i:"🏅",t:"Recognise your Security Champions",d:"Identify colleagues who consistently demonstrate secure behaviour, report threats, and help colleagues. Public recognition reinforces exactly the behaviours you want to see more of."},
+      {c:"amber",i:"🔮",t:"Plan for emerging threats",d:"AI-generated phishing, deepfake audio attacks, and supply chain compromises are growing threats. Build next year's programme to address tomorrow's risks, not just today's."},
+      {c:"red",i:"🔄",t:"Security is a journey, not a destination",d:"No organisation is ever 'done' with security. The goal is continuous improvement — better detection, faster response, and a stronger human firewall with every passing year."},
+    ],
+    quiz:[
+      {q:"What is the most important metric to track in a security awareness programme?",o:["Number of training sessions delivered","Reduction in phishing simulation click rates over time","Employee satisfaction scores with training","Number of advisories distributed"],c:1,e:"Behavioural change is the ultimate goal. Phishing simulation click rates directly measure whether employees are applying their training — and whether the programme is working."},
+    ]
+  },
+];
+
+const EMAILS = [
+  {from:"IT Support <helpdesk@byteridge-it-support.com>",to:"all-staff@byteridge.in",subj:"⚠ Urgent: Your account will be deactivated in 4 hours",body:"Dear Employee,\n\nOur systems detected unusual login activity on your account. To prevent suspension, please verify your account immediately.\n\nClick here to verify your account now →\n\nFailure to act within 4 hours will result in permanent deactivation.\n\n— IT Security Team, ByteRidge",isPhish:true,clues:["Sender is @byteridge-it-support.com — NOT @byteridge.in","4-hour deadline is manufactured urgency — a classic pressure tactic","'Dear Employee' — no name used. Real IT systems know your name","No IT team sends 'verify your account' links by email","Threat of permanent deactivation is a fear tactic"]},
+  {from:"Google Workspace <no-reply@accounts.google.com>",to:"you@byteridge.in",subj:"Security alert: New sign-in on Windows",body:"Hi,\n\nA new sign-in was detected on your Google Account.\n\nDevice: Windows  ·  Location: Bengaluru, India\nTime: Today, 10:42 AM IST\n\nIf this was you, no action is needed. If you don't recognise this sign-in, you can review your account activity.\n\n— The Google Account Team",isPhish:false,clues:["Sender is @accounts.google.com — a legitimate Google domain","Purely informational — no threats, no urgency, no links to click","Includes specific device, location, and time details","Gives you the option to ignore if it was you","Calm, factual tone — the opposite of fear/urgency tactics"]},
+  {from:"Payroll Team <salaries@byteridge.payroll-india.net>",to:"all-staff@byteridge.in",subj:"Action Required: Bank account update for February salary",body:"Dear Team Member,\n\nAs part of our annual payroll system migration, all employees must reconfirm salary bank account details by February 15th.\n\nPlease submit your bank details here to avoid any delay in salary processing →\n\nFailure to update by the deadline may result in salary processing delays.\n\n— ByteRidge Payroll Team",isPhish:true,clues:["Domain is byteridge.payroll-india.net — NOT byteridge.in","Payroll never asks for bank details via an email link","Threatens salary delay to create urgency","No employee name — a mass phishing blast","Real payroll updates happen through official HR systems/portals"]},
+  {from:"Zoom <no-reply@zoom.us>",to:"you@byteridge.in",subj:"Your cloud recording is now available",body:"Hi,\n\nYour Zoom cloud recording from the meeting 'ByteRidge Q1 Planning' on February 6 is now available.\n\nView Recording — link expires in 30 days\n\nThis recording is only accessible to you and anyone you explicitly share the link with.\n\n— The Zoom Team",isPhish:false,clues:["Sender is @zoom.us — a legitimate and verified Zoom domain","References a specific meeting you would recognise","No urgency, no threats, no credential requests of any kind","Standard Zoom notification format and tone","30-day expiry is reasonable — not a panic-inducing deadline"]},
+  {from:"Microsoft 365 <alerts@microsoft-account-notifications.org>",to:"you@byteridge.in",subj:"Your Microsoft 365 license has expired — renew immediately",body:"Dear Microsoft 365 User,\n\nYour Microsoft 365 Business subscription has expired. You have lost access to Word, Excel, Outlook, and all Microsoft 365 services.\n\nRenew now — exclusive 60% discount available today only!\n\nThis offer expires at midnight tonight. Act immediately to restore full access.",isPhish:true,clues:["Microsoft uses @microsoft.com — never @microsoft-account-notifications.org","'Today only 60% discount' is a high-pressure sales tactic","Microsoft 365 licenses are managed by IT admins — not emailed to individuals","'Dear Microsoft 365 User' — generic, no personalisation","Midnight deadline combined with loss of access = combined fear and urgency"]},
+  {from:"Vijay (CEO) <ceo@byteridge-corporate.net>",to:"finance@byteridge.in",subj:"Confidential: Urgent vendor payment needed today",body:"Hi,\n\nI'm in a client meeting and can't call right now. I need you to urgently arrange a payment of ₹4,50,000 to a new vendor before 5pm today.\n\nPlease handle this quietly — it's commercially sensitive and I don't want it discussed with others right now.\n\nI'll explain everything in full detail after 3pm today.\n\nSent from my iPhone",isPhish:true,clues:["Sender domain is byteridge-corporate.net — NOT byteridge.in","Classic Business Email Compromise (BEC) / CEO fraud attack","'Handle quietly, don't discuss with others' = isolation tactic","No vendor details, invoice, or purchase order reference provided","Legitimate fund transfers always follow an authorisation and approval process"]},
+];
+
+// ════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════
+let quizMonth=0, curQ=0, qScore=0, qAnswered=false;
+let simIdx=0, simCorrect=0, simWrong=0, simAnswered=false;
+let tipsMonth=0;
+let openDetailMonth=null;
+
+// ════════════════════════════════════════════════════════
+//  TAB NAV
+// ════════════════════════════════════════════════════════
+function showTab(id, btn){
+  document.querySelectorAll('#module-annual .section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('#module-annual .tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ════════════════════════════════════════════════════════
+//  ROADMAP
+// ════════════════════════════════════════════════════════
+function buildRoadmap(){
+  const quarters=[
+    {n:'Q1',cls:'q1h',label:'Q1 — Foundations & Continuity'},
+    {n:'Q2',cls:'q2h',label:'Q2 — Physical & Remote Access'},
+    {n:'Q3',cls:'q3h',label:'Q3 — The Human Element'},
+    {n:'Q4',cls:'q4h',label:'Q4 — Recognition & Review'},
+  ];
+  const root = document.getElementById('roadmap-root');
+  root.innerHTML = quarters.map((q,qi)=>{
+    const ms = MONTHS.filter(m=>m.q===qi+1);
+    return `<div class="quarter">
+      <div class="q-header ${q.cls}" onclick="toggleQHeader(this)">
+        <span>📁 ${q.label}</span><span class="chevron">▶</span>
+      </div>
+      <div class="months-grid">
+        ${ms.map(m=>`
+          <div class="month-card${m.m===1?' current':''}" onclick="toggleMonthDetail(${m.m})">
+            <div class="mc-num">Month ${m.m}</div>
+            <div class="mc-title">${m.title}</div>
+            <div class="mc-theme">${m.theme}</div>
+          </div>
+        `).join('')}
+      </div>
+      ${ms.map(m=>`
+        <div class="month-detail" id="detail-${m.m}">
+          <div class="md-header">
+            <div class="md-dot" style="background:${m.color}">M${m.m}</div>
+            <div>
+              <div class="md-name">${m.title}</div>
+              <div class="md-quarter">Q${m.q} · ${m.theme}</div>
+            </div>
+          </div>
+          <div class="deliverables">${m.deliverables.map(d=>`<span class="dtag ${dColor(d)}">${d}</span>`).join('')}</div>
+          <ul class="initiatives">${m.initiatives.map(i=>`<li>${i}</li>`).join('')}</ul>
+          <div class="md-actions">
+            <button class="action-btn primary" onclick="goQuiz(${m.m})">Take Quiz →</button>
+            <button class="action-btn secondary" onclick="goTips(${m.m})">View Tips</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+  }).join('');
+  // Open Q1 by default
+  const firstHdr = document.querySelector('.q-header');
+  if(firstHdr) firstHdr.classList.add('open');
+}
+
+function dColor(d){
+  const map={Advisory:'blue',Quiz:'green',Webinar:'blue',Simulation:'red','Cheat Sheet':'amber','Training Session':'amber','Policy Review':'green','Tabletop Exercise':'red','Emergency Training':'red','BCP Review':'green',Drill:'red','Access Audit':'amber','Password Manager Eval':'amber','Policy Audit':'red','Role-Play Workshop':'green','Interactive Session':'blue','Simulated Call':'red','MDM Drive':'amber','Access Review':'green','Culture Initiative':'green','Awareness Sessions':'blue','Guest Speaker':'amber',Videos:'green','Quiz Tournament':'blue',Awards:'amber','Advanced Training':'red','Email Security Review':'blue','Year-End Report':'green','Awards Ceremony':'amber','Next Year Planning':'blue','Lessons Learned':'green','MFA Campaign':'green','Policy Update':'amber'};
+  return map[d]||'blue';
+}
+
+function toggleQHeader(hdr){ hdr.classList.toggle('open'); }
+
+function toggleMonthDetail(n){
+  const el=document.getElementById('detail-'+n);
+  if(openDetailMonth===n){ el.classList.remove('open'); openDetailMonth=null; return; }
+  document.querySelectorAll('.month-detail').forEach(e=>e.classList.remove('open'));
+  el.classList.add('open');
+  openDetailMonth=n;
+  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+}
+
+function goQuiz(m){
+  quizMonth=MONTHS.findIndex(x=>x.m===m);
+  curQ=0;qScore=0;qAnswered=false;
+  buildQuizNav();renderQuiz();
+  document.querySelectorAll('#module-annual .section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('#module-annual .tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-quiz').classList.add('active');
+  document.querySelectorAll('#module-annual .tab')[1].classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goTips(m){
+  tipsMonth=MONTHS.findIndex(x=>x.m===m);
+  buildTipsNav();renderTips();
+  document.querySelectorAll('#module-annual .section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('#module-annual .tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-tips').classList.add('active');
+  document.querySelectorAll('#module-annual .tab')[3].classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ════════════════════════════════════════════════════════
+//  QUIZ
+// ════════════════════════════════════════════════════════
+function buildQuizNav(){
+  const nav=document.getElementById('quiz-month-nav');
+  nav.innerHTML=MONTHS.map((m,i)=>`<button class="ms-btn${i===quizMonth?' active':''}" onclick="switchQuiz(${i})">${m.m}. ${m.title}</button>`).join('');
+}
+
+function switchQuiz(i){ quizMonth=i;curQ=0;qScore=0;qAnswered=false;buildQuizNav();renderQuiz(); }
+
+function renderQuiz(){
+  const M=MONTHS[quizMonth];
+  if(curQ>=M.quiz.length){ showResult(); return; }
+  const d=M.quiz[curQ];
+  document.getElementById('quiz-root').innerHTML=`
+    <div class="quiz-meta">
+      <div>
+        <div class="q-info">Month ${M.m}: ${M.title} · Question ${curQ+1} of ${M.quiz.length}</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${(curQ/M.quiz.length)*100}%"></div></div>
+      </div>
+      <div class="q-score">Score: ${qScore} / ${M.quiz.length}</div>
+    </div>
+    <div class="question-card">
+      <div class="q-number">Question ${curQ+1}</div>
+      <div class="q-text">${d.q}</div>
+      <div class="options">${d.o.map((o,i)=>`<button class="option" id="opt-${i}" onclick="answerQ(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}</div>
+      <div class="feedback" id="fb"></div>
+      <button class="next-btn" id="nxt" onclick="nextQ()">${curQ===M.quiz.length-1?'See my results →':'Next question →'}</button>
+    </div>`;
+  qAnswered=false;
+}
+
+function answerQ(idx){
+  if(qAnswered) return; qAnswered=true;
+  const d=MONTHS[quizMonth].quiz[curQ];
+  document.querySelectorAll('.option').forEach(o=>o.disabled=true);
+  document.getElementById('opt-'+d.c).classList.add('correct');
+  const fb=document.getElementById('fb');
+  if(idx===d.c){ qScore++; fb.className='feedback correct show'; fb.textContent='✓ Correct! '+d.e; }
+  else{ document.getElementById('opt-'+idx).classList.add('wrong'); fb.className='feedback wrong show'; fb.textContent='✗ Not quite. '+d.e; }
+  document.getElementById('nxt').className='next-btn show';
+}
+
+function nextQ(){ curQ++; renderQuiz(); }
+
+function showResult(){
+  const M=MONTHS[quizMonth];
+  const pct=Math.round((qScore/M.quiz.length)*100);
+  let msg,bc;
+  if(pct>=80){msg="Excellent work! You have a strong grasp of this month's security theme. Share your knowledge with your team.";bc='green';}
+  else if(pct>=60){msg="Good effort. Review the explanations above and retake the quiz to get a perfect score.";bc='amber';}
+  else{msg="Keep going — check the Tips for this month and try the quiz again. Practice makes the difference.";bc='red';}
+  document.getElementById('quiz-root').innerHTML=`
+    <div class="result-card">
+      <div class="result-score">${qScore}/${M.quiz.length}</div>
+      <div class="result-pct">${pct}% · Month ${M.m}: ${M.title}</div>
+      <div class="result-msg">${msg}</div>
+      <div class="result-badges">
+        <span class="badge ${bc}">Month ${M.m} Completed</span>
+        ${pct===100?'<span class="badge green">Perfect Score 🏆</span>':''}
+      </div>
+      <button class="restart-btn" onclick="switchQuiz(${quizMonth})">Retake Quiz</button>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════════
+//  PHISHING SIM
+// ════════════════════════════════════════════════════════
+function renderEmail(){
+  const e=EMAILS[simIdx];
+  simAnswered=false;
+  document.getElementById('sim-counter').textContent=`Email ${simIdx+1} of ${EMAILS.length} — read carefully`;
+  document.getElementById('sim-root').innerHTML=`
+    <div class="email-frame">
+      <div class="email-chrome">
+        <div class="chrome-dots"><div class="dot dot-red"></div><div class="dot dot-amber"></div><div class="dot dot-green"></div></div>
+        <span class="chrome-label">📥 Inbox</span>
+      </div>
+      <div class="email-header">
+        <div class="email-field"><strong>From:</strong><span class="val${e.isPhish?' red':''}">${e.from}</span></div>
+        <div class="email-field"><strong>To:</strong><span class="val">${e.to}</span></div>
+        <div class="email-subject">${e.subj}</div>
+      </div>
+      <div class="email-body">${e.body.replace(/→/g,'<span class="email-link">→</span>')}</div>
+      <div class="email-actions">
+        <button class="phish-btn danger" onclick="simAnswer(true)">⚠ Report Phishing</button>
+        <button class="phish-btn safe" onclick="simAnswer(false)">✓ Mark as Legitimate</button>
+      </div>
+      <div class="verdict" id="verdict"></div>
+    </div>`;
+}
+
+function simAnswer(rep){
+  if(simAnswered) return; simAnswered=true;
+  const e=EMAILS[simIdx];
+  const ok=(rep===e.isPhish);
+  if(ok) simCorrect++; else simWrong++;
+  document.getElementById('sim-correct').textContent=simCorrect;
+  document.getElementById('sim-wrong').textContent=simWrong;
+  const v=document.getElementById('verdict');
+  const line=ok?(e.isPhish?'✓ Correct — this IS a phishing email.':'✓ Correct — this is a legitimate email.'):(e.isPhish?'✗ Missed — this WAS a phishing email.':'✗ Incorrect — this was actually a legitimate email.');
+  v.className=`verdict show ${e.isPhish?'phishing':'legit'}`;
+  v.innerHTML=`<div class="verdict-title">${line}</div><strong>Key indicators:</strong><ul class="clue-list">${e.clues.map(c=>`<li>${c}</li>`).join('')}</ul>`;
+  document.querySelectorAll('.phish-btn').forEach(b=>b.disabled=true);
+}
+
+function nextEmail(){ simIdx=(simIdx+1)%EMAILS.length; renderEmail(); }
+
+// ════════════════════════════════════════════════════════
+//  TIPS
+// ════════════════════════════════════════════════════════
+function buildTipsNav(){
+  const nav=document.getElementById('tips-month-nav');
+  nav.innerHTML=MONTHS.map((m,i)=>`<button class="ms-btn${i===tipsMonth?' active':''}" onclick="switchTips(${i})">${m.m}. ${m.title}</button>`).join('');
+}
+
+function switchTips(i){ tipsMonth=i; buildTipsNav(); renderTips(); }
+
+function renderTips(){
+  const M=MONTHS[tipsMonth];
+  document.getElementById('tips-root').innerHTML=`
+    <div class="card" style="margin-bottom:12px">
+      <div class="section-label">Month ${M.m} · ${M.theme}</div>
+      <div style="font-size:20px;font-weight:600;color:var(--navy)">${M.title}</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px">${M.tips.length} key security tips for your team</div>
+    </div>
+    ${M.tips.map(t=>`
+      <div class="tip-card">
+        <div class="tip-icon ${t.c}">${t.i}</div>
+        <div><div class="tip-title">${t.t}</div><div class="tip-desc">${t.d}</div></div>
+      </div>
+    `).join('')}`;
+}
+
+// ════════════════════════════════════════════════════════
+//  CHEAT SHEET
+// ════════════════════════════════════════════════════════
+function buildCheatSheets(){
+  const root=document.getElementById('cheatsheet-root');
+  root.innerHTML=MONTHS.map(m=>`
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:36px;height:36px;border-radius:7px;background:${m.color};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0">M${m.m}</div>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:var(--navy)">Month ${m.m}: ${m.title}</div>
+          <div style="font-size:12px;color:var(--muted)">Q${m.q} · ${m.theme}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="action-btn primary" onclick="printSheet(${m.m})">🖨 Print Cheat Sheet</button>
+        <button class="action-btn secondary" onclick="goQuiz(${m.m})">Take Quiz →</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function printSheet(n){
+  const M=MONTHS.find(m=>m.m===n);
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>ByteRidge Month ${n} Cheat Sheet</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'DM Sans',Arial,sans-serif;background:#fff;color:#1A2B3C;padding:24px;font-size:12px}
+    .header{background:#0B2545;color:#fff;padding:16px 20px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .header h1{font-size:20px;font-weight:600}
+    .header p{font-size:11px;color:#7BA7D4;margin-top:3px}
+    .header .org{font-size:13px;font-weight:600;text-align:right}
+    h2{font-size:13px;font-weight:600;color:#1A4A8A;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid #D0DFF0;text-transform:uppercase;letter-spacing:0.5px}
+    .tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+    .tip{background:#F4F8FF;border-radius:6px;padding:10px 12px}
+    .tip-title{font-weight:600;color:#0B2545;margin-bottom:3px;font-size:12px}
+    .tip-desc{font-size:11px;color:#5A7A9A;line-height:1.5}
+    .steps{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    .step{border-radius:6px;overflow:hidden}
+    .step-hdr{padding:8px 10px;font-weight:700;color:#fff;font-size:13px}
+    .step-body{background:#F4F8FF;padding:8px 10px;font-size:11px;color:#3A5068;line-height:1.5;border:1px solid #D0DFF0;border-top:none}
+    .emergency{background:#C0392B;color:#fff;padding:10px 14px;border-radius:6px;margin:12px 0}
+    .emergency b{font-size:12px}
+    .emergency p{font-size:11px;margin-top:4px;opacity:0.92}
+    .checklist{background:#E6F5ED;border:1px solid #A9D9BE;border-radius:6px;padding:10px 14px}
+    .check{display:flex;gap:8px;margin-bottom:5px;font-size:11px;color:#1A4A35}
+    .box{width:12px;height:12px;border:1.5px solid #1A7A4A;border-radius:2px;flex-shrink:0;margin-top:1px}
+    .footer{background:#1A4A8A;color:#fff;padding:10px 16px;border-radius:6px;display:flex;justify-content:space-between;font-size:11px;margin-top:12px}
+    @media print{body{padding:16px}.header{margin-bottom:12px}}
+  </style></head><body>
+  <div class="header">
+    <div><h1>Month ${n}: ${M.title}</h1><p>Q${M.q} · ${M.theme} · ByteRidge Security Awareness Programme</p></div>
+    <div class="org">ByteRidge Technologies<br><span style="font-size:11px;color:#7BA7D4">BYT-SEC-ADV-00${n}</span></div>
+  </div>
+  <h2>Key Security Tips</h2>
+  <div class="tips-grid">${M.tips.map(t=>`<div class="tip"><div class="tip-title">${t.i} ${t.t}</div><div class="tip-desc">${t.d}</div></div>`).join('')}</div>
+  <h2>The ByteRidge 3-Step Response</h2>
+  <div class="steps">
+    <div class="step"><div class="step-hdr" style="background:#C0392B">STEP 1 — STOP</div><div class="step-body">Do not click links, open attachments, or reply. Even replying tells the attacker your address is active.</div></div>
+    <div class="step"><div class="step-hdr" style="background:#B7640A">STEP 2 — REPORT</div><div class="step-body">Forward to security@byteridge.in immediately. Do NOT delete — headers are needed for investigation.</div></div>
+    <div class="step"><div class="step-hdr" style="background:#1A7A4A">STEP 3 — VERIFY</div><div class="step-body">Contact the apparent sender via phone or Slack — never using contact details from the suspicious email.</div></div>
+  </div>
+  <div class="emergency"><b>⚡ Already Clicked? Act immediately:</b><p>1. Disconnect from Wi-Fi/LAN · 2. Call IT — do not email or wait · 3. Do not try to fix it yourself · Zero blame for reporting quickly.</p></div>
+  <h2>Month ${n} Checklist</h2>
+  <div class="checklist">${M.initiatives.map(i=>`<div class="check"><div class="box"></div>${i}</div>`).join('')}</div>
+  <div class="footer">
+    <span>Report phishing: security@byteridge.in</span>
+    <span>IT Helpdesk: helpdesk@byteridge.in</span>
+    <span>Month ${n} of 12 · All Staff</span>
+  </div>
+
+// ════════════════════════════════════════════════════════
+//  SOC2 MODULE DATA
+// ════════════════════════════════════════════════════════
+const HUB_QUESTIONS = [
+  {q:"An email from 'HR Department <payroll@byteridge-hr-notifications.net>' asks you to verify your bank details for salary processing. What should you do?",opts:["Update your bank details immediately","Ignore and delete it","Forward it to IT/security and do NOT click any links","Reply asking for more information"],correct:2,explain:"The domain 'byteridge-hr-notifications.net' is NOT byteridge.in. Attackers register lookalike domains. Always verify HR requests through the official intranet or by calling HR directly."},
+  {q:"Which of these is the strongest indicator that an email may be a phishing attempt?",opts:["The email has your name in it","The email creates urgency ('Your account will be suspended in 24 hours!')","The email comes from a Gmail address","The email has company logos"],correct:1,explain:"Urgency and fear are the primary psychological weapons in phishing. Legitimate organizations give you time to verify. Logos and your name are easy to fake."},
+  {q:"You receive an email with a link. When you hover over it, the status bar shows: 'http://secure-byteridge-login.xyz/auth'. What does this tell you?",opts:["It's secure because it says 'secure'","It's the official ByteRidge login — fine to click","It's suspicious — the domain is not byteridge.in","The .xyz makes it an international site — safe"],correct:2,explain:"The actual domain is 'secure-byteridge-login.xyz' — not byteridge.in. Words like 'secure' or 'login' in the URL mean nothing. The domain after the last dot before the first slash is what matters."},
+  {q:"A colleague WhatsApps you: 'I'm stuck in a meeting, can you send me the client credentials file? It's urgent.' What's your response?",opts:["Send immediately — it's a trusted colleague","Call or meet them in person to verify the request before doing anything","Reply asking what file exactly","Send it and tell your manager afterward"],correct:1,explain:"This is a classic social engineering tactic — even if it IS your colleague, their account may be compromised. Always verify sensitive requests through a second channel (voice call, face-to-face)."},
+  {q:"What does 'HTTPS' in a website URL guarantee?",opts:["The website is safe and legitimate","Your connection to the site is encrypted","The company behind the site is verified","The site cannot steal your data"],correct:1,explain:"HTTPS only means your connection is encrypted — it does NOT mean the website is trustworthy. Phishing sites use HTTPS too. You can have a secure connection to a malicious site."},
+  {q:"You open a PDF from an unknown sender and it asks you to 'Enable Macros' or 'Enable Editing' to view content. What should you do?",opts:["Enable it — the content looks important","Close the file and report it to IT immediately","Enable it only if your antivirus didn't flag it","Save and reopen in a different app"],correct:1,explain:"'Enable Macros/Editing' prompts are one of the most common malware delivery mechanisms. Legitimate documents don't need macros to display content. Close and report immediately."},
+  {q:"ByteRidge's IT team sends a mass email saying 'Password reset required for all users — click here within 2 hours.' How do you verify this is legitimate?",opts:["The email came from an @byteridge.in address, so it's fine","Check with a colleague to see if they got the same email","Call or message IT directly using a number from the official intranet — not from the email","Click the link but don't enter your password"],correct:2,explain:"Email addresses can be spoofed. The ONLY safe way to verify is to contact IT through a channel you already know and trust — not from any link or phone number in the suspicious email itself."},
+  {q:"Which combination provides the best protection for your ByteRidge accounts?",opts:["A long password changed every 30 days","A unique 12+ character password + MFA enabled","The same strong password across all work accounts","Fingerprint login only"],correct:1,explain:"Unique passwords prevent credential stuffing attacks. MFA means even a stolen password can't be used alone. Together they block over 99% of automated account attacks."}
+];
+
+const HUB_EMAILS = [
+  {from:"IT Helpdesk <helpdesk@byteridge-it-support.com>",to:"All Staff",subject:"Urgent: Your account will be deactivated — action required",body:`<p>Dear Employee,</p><p>Our system has detected unusual login activity on your account. To prevent unauthorized access, your ByteRidge account will be <strong>deactivated within 4 hours</strong> unless you verify your identity.</p><p style="margin:14px 0"><a class="email-link">Click here to verify your account immediately →</a></p><p>If you do not act, you will lose access to all ByteRidge systems.</p><p>— IT Security Team</p>`,isPhishing:true,clues:["Sender domain is 'byteridge-it-support.com' — not byteridge.in","Creates extreme urgency (4-hour deadline)","Vague threat language — 'unusual activity'","No specific detail about what activity was detected","Real IT teams don't threaten account deletion via email link"]},
+  {from:"Google Workspace <no-reply@accounts.google.com>",to:"vijay@byteridge.in",subject:"Security alert: New sign-in on Windows",body:`<p>Hi Vijay,</p><p>A new sign-in was detected on your Google Account.</p><p><strong>Device:</strong> Windows · <strong>Location:</strong> Bengaluru, Karnataka<br><strong>Time:</strong> Today, 10:42 AM IST</p><p>If this was you, no action is needed. If you don't recognize this sign-in, <a class="email-link">review your account activity</a>.</p><p>Google Security Team</p>`,isPhishing:false,clues:["Sender domain is accounts.google.com — legitimate","No urgency or threats — just informational","Includes specific details (device, location, time)","Gives you the option to ignore if it was you","Language is calm and factual"]},
+  {from:"Payroll <salaries@byteridge.payroll-india.net>",to:"All Employees",subject:"Action Required: Salary account update for February cycle",body:`<p>Dear Team Member,</p><p>As part of our annual payroll system migration, all employees must re-confirm their salary bank account details by <strong>February 15th</strong>.</p><p style="margin:14px 0">Please <a class="email-link">submit your bank account details here</a> to ensure there is no delay in your February salary.</p><p>Failure to update by the deadline may result in salary processing delays.</p><p>Regards,<br>Payroll Team, ByteRidge</p>`,isPhishing:true,clues:["Domain is 'byteridge.payroll-india.net' — not byteridge.in","Payroll never asks for bank details via email link","Threatens salary delay to create urgency","No employee name — mass phishing blast","Legitimate payroll updates go through HR systems/portals"]},
+  {from:"Zoom <no-reply@zoom.us>",to:"vijay@byteridge.in",subject:"Your cloud recording is available",body:`<p>Hi Vijay,</p><p>Your Zoom cloud recording from the meeting <em>ByteRidge Q1 Planning</em> on February 6 is now available.</p><p style="margin:12px 0"><a class="email-link">View Recording (expires in 30 days)</a></p><p>This recording is only visible to you and anyone you share the link with.</p><p>— The Zoom Team</p>`,isPhishing:false,clues:["Sender is @zoom.us — a legitimate domain","Mentions a specific meeting you'd recognize","No urgency, no threats, no credential requests","Standard Zoom notification format","Expiry is reasonable — not a panic deadline"]},
+  {from:"Microsoft 365 <microsoft365@microsoft-account-notifications.org>",to:"vijay@byteridge.in",subject:"Your Microsoft 365 license has expired — renew now",body:`<p>Dear Microsoft 365 User,</p><p>Your Microsoft 365 Business subscription has <strong>expired</strong>. You have lost access to Word, Excel, Outlook and all Microsoft services.</p><p style="margin:14px 0"><a class="email-link">Renew your subscription now — Special 60% discount today only</a></p><p>This offer expires at midnight. Act immediately to restore access.</p>`,isPhishing:true,clues:["Domain is 'microsoft-account-notifications.org' — not microsoft.com","Microsoft never emails from .org domains","'Today only' discount is a pressure tactic","You'd know if your organization's Microsoft license expired","Real license alerts go through your IT admin — not individuals"]}
+];
+
+let hubCurrentQ = 0, hubCurrentScore = 0, hubAnswered = false;
+
+function hubRenderQuiz() {
+  if(hubCurrentQ >= HUB_QUESTIONS.length) {hubShowResult();return;}
+  const d = HUB_QUESTIONS[hubCurrentQ];
+  const pct = Math.round(((hubCurrentQ)/HUB_QUESTIONS.length)*100);
+  document.getElementById('q-bar').style.width=(hubCurrentQ/HUB_QUESTIONS.length*100)+'%';
+  document.getElementById('q-progress').textContent=`Question ${hubCurrentQ+1} of ${HUB_QUESTIONS.length}`;
+  document.getElementById('hub-q-score').textContent=hubCurrentScore;
+  document.getElementById('quiz-container').innerHTML=`
+    <div class="question-card">
+      <div class="question-num">Question ${hubCurrentQ+1} · Month 1: Phishing Awareness</div>
+      <div class="question-text">${d.q}</div>
+      <div class="options">${d.opts.map((o,i)=>`<button class="option" onclick="answerQ(${i})" id="opt-${i}">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}</div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next-btn" id="next-btn" onclick="nextQ()">${hubCurrentQ===HUB_QUESTIONS.length-1?'See my results →':'Next question →'}</button>
+    </div>`;
+  hubAnswered=false;
+}
+
+function answerQ(idx) {
+  if(hubAnswered)return;
+  hubAnswered=true;
+  const d=HUB_QUESTIONS[hubCurrentQ];
+  const opts=document.querySelectorAll('.option');
+  opts.forEach(o=>o.disabled=true);
+  opts[d.correct].classList.add('correct');
+  const fb=document.getElementById('feedback');
+  if(idx===d.correct){
+    hubCurrentScore++;
+    document.getElementById('hub-q-score').textContent=hubCurrentScore;
+    fb.className='feedback correct show';
+    fb.innerHTML='&#10003; Correct! '+d.explain;
+  } else {
+    opts[idx].classList.add('wrong');
+    fb.className='feedback wrong show';
+    fb.innerHTML='&#10007; Not quite. '+d.explain;
+  }
+  document.getElementById('next-btn').className='next-btn show';
+}
+
+function hubNextQ(){hubCurrentQ++;hubRenderQuiz();}
+
+function hubShowResult(){
+  const pct=Math.round((hubCurrentScore/HUB_QUESTIONS.length)*100);
+  let msg,badge,bc;
+  if(pct>=88){msg="Outstanding! You're a security champion. Share your knowledge with colleagues.";badge="Security Champion";bc="green";}
+  else if(pct>=63){msg="Good effort! Review the areas where you slipped up. A few key habits can make the difference.";badge="Progressing";bc="amber";}
+  else{msg="Keep learning — phishing awareness takes practice. Review the Security Tips tab and retake the quiz.";badge="Needs Review";bc="red";}
+  document.getElementById('quiz-container').innerHTML=`
+    <div class="result-card">
+      <div class="result-hubCurrentScore">${hubCurrentScore}/${HUB_QUESTIONS.length}</div>
+      <div class="result-label">${pct}% — Month 1 Phishing Quiz</div>
+      <div class="result-msg">${msg}</div>
+      <div class="result-badges">
+        <span class="badge ${bc}">${badge}</span>
+        <span class="badge green">Month 1 Attempted</span>
+      </div>
+      <button class="restart-btn" onclick="restartQuiz()">Retake Quiz</button>
+    </div>`;
+  document.getElementById('q-bar').style.width='100%';
+  document.getElementById('q-progress').textContent='Complete!';
+  document.getElementById('hub-q-score').textContent=hubCurrentScore;
+}
+
+function hubRestartQuiz(){hubCurrentQ=0;hubCurrentScore=0;hubRenderQuiz();}
+
+// PHISHING SIMULATOR
+
+let simIdx=0, simCorrect=0, simWrong=0, hubSimAnswered=false;
+
+function renderEmail(){
+  const e=HUB_EMAILS[simIdx];
+  hubSimAnswered=false;
+  document.getElementById('sim-counter').innerHTML=`Email ${simIdx+1} of ${HUB_EMAILS.length} · <strong>Is this phishing or legitimate?</strong>`;
+  document.getElementById('email-container').innerHTML=`
+    <div class="email-frame">
+      <div class="email-toolbar">
+        <div class="email-dot" style="background:#FF5F57"></div>
+        <div class="email-dot" style="background:#FFBD2E"></div>
+        <div class="email-dot" style="background:#28CA41"></div>
+        <span style="font-size:12px;color:var(--muted);margin-left:8px">Inbox</span>
+      </div>
+      <div class="email-header">
+        <div class="email-field">From: <span>${e.from}</span></div>
+        <div class="email-field">To: <span>${e.to}</span></div>
+        <div class="email-subject">${e.subject}</div>
+      </div>
+      <div class="email-body">${e.body}</div>
+      <div style="padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap">
+        <button class="phish-btn danger" onclick="simAnswer(true)">&#9888; Report as Phishing</button>
+        <button class="phish-btn safe" onclick="simAnswer(false)">&#10003; Mark as Legitimate</button>
+      </div>
+      <div class="verdict" id="verdict"></div>
+    </div>`;
+}
+
+function hubSimAnswer(reportedPhishing){
+  if(hubSimAnswered)return;
+  hubSimAnswered=true;
+  const e=HUB_EMAILS[simIdx];
+  const correct=(reportedPhishing===e.isPhishing);
+  if(correct)simCorrect++;else simWrong++;
+  document.getElementById('sim-correct').textContent=simCorrect;
+  document.getElementById('sim-wrong').textContent=simWrong;
+  const v=document.getElementById('verdict');
+  v.className=`verdict show ${e.isPhishing?'phishing':'legit'}`;
+  const resultLine = correct ? (e.isPhishing?'&#10003; Correct — this IS a phishing email.':'&#10003; Correct — this is a legitimate email.') : (e.isPhishing?'&#10007; Missed — this WAS a phishing email.':'&#10007; Incorrect — this was actually a legitimate email.');
+  v.innerHTML=`<div class="verdict-title">${resultLine}</div><strong>Key indicators:</strong><ul class="clue-list">${e.clues.map(c=>`<li>${c}</li>`).join('')}</ul>`;
+  document.querySelectorAll('.phish-btn').forEach(b=>b.disabled=true);
+}
+
+function hubNextEmail(){simIdx=(simIdx+1)%HUB_EMAILS.length;renderEmail();}
+
+function hubShowSection(id){
+  document.querySelectorAll('#module-annual .section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+
+// ════════════════════════════════════════════════════════
+//  SOC2 FINAL QUIZ STATE
+// ════════════════════════════════════════════════════════
+let finalCurrentQ = 0, finalScore = 0, finalAnswered = false;
+let finalQs = [];
+
+function initFinalQuiz() {
+  // Shuffle all hub questions and take 10
+  const all = [...HUB_QUESTIONS];
+  for(let i=all.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[all[i],all[j]]=[all[j],all[i]];}
+  finalQs = all.slice(0, Math.min(10, all.length));
+  finalCurrentQ = 0; finalScore = 0; finalAnswered = false;
+  renderFinalQuiz();
+}
+
+function renderFinalQuiz() {
+  if(finalCurrentQ >= finalQs.length){ showFinalResult(); return; }
+  const d = finalQs[finalCurrentQ];
+  const pct = Math.round((finalCurrentQ/finalQs.length)*100);
+  document.getElementById('q-bar-final').style.width = pct + '%';
+  document.getElementById('q-progress-final').textContent = `Question ${finalCurrentQ+1} of ${finalQs.length}`;
+  document.getElementById('hub-q-score-final').textContent = finalScore;
+  finalAnswered = false;
+  document.getElementById('quiz-container-final').innerHTML = `
+    <div class="question-card">
+      <div class="q-number">Question ${finalCurrentQ+1}</div>
+      <div class="q-text">${d.q}</div>
+      <div class="options">${d.opts.map((o,i)=>`<button class="option" id="fopt-${i}" onclick="answerFinal(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}</div>
+      <div class="feedback" id="ffb"></div>
+      <button class="next-btn" id="fnxt" onclick="nextFinalQ()">${finalCurrentQ===finalQs.length-1?'See results →':'Next →'}</button>
+    </div>`;
+}
+
+function answerFinal(idx){
+  if(finalAnswered) return; finalAnswered=true;
+  const d=finalQs[finalCurrentQ];
+  document.querySelectorAll('[id^=fopt-]').forEach(o=>o.disabled=true);
+  document.getElementById('fopt-'+d.ans).classList.add('correct');
+  const fb=document.getElementById('ffb');
+  if(idx===d.ans){ finalScore++; fb.className='feedback correct show'; fb.textContent='✓ Correct! '+d.explain; }
+  else{ document.getElementById('fopt-'+idx).classList.add('wrong'); fb.className='feedback wrong show'; fb.textContent='✗ '+d.explain; }
+  document.getElementById('fnxt').className='next-btn show';
+}
+
+function nextFinalQ(){ finalCurrentQ++; renderFinalQuiz(); }
+
+function showFinalResult(){
+  const pct=Math.round((finalScore/finalQs.length)*100);
+  const passed=pct>=80;
+  let msg,bc;
+  if(pct>=80){msg="Excellent! You've passed the SOC 2 compliance assessment. Proceed to Section 8 to view your certificate.";bc='green';}
+  else if(pct>=60){msg="Good effort — but you need 80% to pass. Review the tips in each section and retake the assessment.";bc='amber';}
+  else{msg="Keep going — review all sections and try again. Security awareness takes practice.";bc='red';}
+  if(passed && document.getElementById('ack-success')?.style.display==='block'){
+    // populate cert
+    const name = document.getElementById('ack-name')?.value || '—';
+    const now = new Date();
+    const ts = now.toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    const cid = 'BR-SOC2-'+now.getFullYear()+'-'+Math.random().toString(36).substr(2,8).toUpperCase();
+    document.getElementById('cert-name').textContent = name;
+    document.getElementById('cert-date').textContent = 'Issued: '+ts;
+    document.getElementById('cert-id').textContent = 'Certificate ID: '+cid;
+  }
+  document.getElementById('quiz-container-final').innerHTML=`
+    <div class="result-card">
+      <div class="result-score">${finalScore}/${finalQs.length}</div>
+      <div class="result-pct">${pct}% · SOC 2 Final Assessment</div>
+      <div class="result-msg">${msg}</div>
+      <div class="result-badges">
+        <span class="badge ${bc}">${passed?'Passed ✓':'Needs Review'}</span>
+        ${pct===100?'<span class="badge green">Perfect Score 🏆</span>':''}
+      </div>
+      ${passed?'<button class="restart-btn" style="background:var(--green)" onclick="soc2Go('s8',document.getElementById('snav-s8'))">View Certificate →</button>':''}
+      <button class="restart-btn" style="${passed?'background:var(--muted);margin-left:8px':''}" onclick="initFinalQuiz()">Retake Assessment</button>
+    </div>`;
+  document.getElementById('q-bar-final').style.width='100%';
+}
+
+
+
+// ════════════════════════════════════════════════════════
+//  SOC2 MODULE NAV
+// ════════════════════════════════════════════════════════
+let soc2Done = {};
+
+function soc2Go(id, btn){
+  document.querySelectorAll('.soc2-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.soc2-nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('soc2-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function submitAck(){
+  const name = document.getElementById('ack-name').value.trim();
+  const dept = document.getElementById('ack-dept').value.trim();
+  if(!name||!dept){alert('Please enter your name and department.');return;}
+  if(!document.getElementById('ac1').checked||!document.getElementById('ac2').checked||!document.getElementById('ac3').checked||!document.getElementById('ac4').checked){
+    alert('Please check all acknowledgment boxes to proceed.');return;
+  }
+  const now = new Date();
+  const ts = now.toLocaleString('en-IN',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const s = document.getElementById('ack-success');
+  s.style.display='block';
+  s.innerHTML=`✓ &nbsp;Acknowledgment recorded for <strong>${name}</strong> (${dept}) at <strong>${ts}</strong>. This timestamp serves as SOC 2 audit evidence.`;
+  soc2Done['s0']=true;
+  document.getElementById('snav-s0').classList.add('done');
+  // pre-fill cert name
+  document.getElementById('cert-name').textContent=name;
+}
+
+
+// ════════════════════════════════════════════════════════
+//  BOOT
+// ════════════════════════════════════════════════════════
+buildRoadmap();
+buildQuizNav();
+renderQuiz();
+renderEmail();
+buildTipsNav();
+renderTips();
+buildCheatSheets();
+hubRenderQuiz();
+initFinalQuiz();
+
+</script>
+</body>
+</html>
